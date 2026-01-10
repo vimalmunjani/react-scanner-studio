@@ -16,10 +16,16 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout
+      - name: Checkout tagged commit
         uses: actions/checkout@v4
         with:
-          fetch-depth: 0   # REQUIRED for tags
+          fetch-depth: 0
+          ref: ${{ github.event.workflow_run.head_sha }}
+
+      - name: Debug ref (temporary)
+        run: |
+          git describe --tags --exact-match || true
+          echo "GITHUB_REF=$GITHUB_REF"
 
       - name: Setup Node.js
         uses: actions/setup-node@v4
