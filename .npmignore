@@ -11,3 +11,6 @@ tsconfig.json
 __tests__/
 *.test.ts
 coverage/
+
+# UI node_modules (ui source is needed for Vite, but not its node_modules)
+ui/node_modules/
