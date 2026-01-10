@@ -1,6 +1,6 @@
 {
   "name": "react-scanner-ui",
-  "version": "0.0.3",
+  "version": "0.0.4",
   "main": "dist/index.js",
   "bin": {
     "react-scanner-ui": "dist/index.js"
