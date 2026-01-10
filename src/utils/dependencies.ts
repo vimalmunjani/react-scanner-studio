@@ -53,7 +53,7 @@ export function installReactScanner(): void {
 
     let command;
     if (useYarn) {
-      command = `yarn add react-scanner --dev${isWorkspace ? ' -W' : ''}`;
+      command = `yarn add react-scanner --dev --ignore-engines${isWorkspace ? ' -W' : ''}`;
     } else {
       command = 'npm install react-scanner --save-dev';
     }
