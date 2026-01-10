@@ -4,3 +4,5 @@ export {
   promptInstallReactScanner,
   installReactScanner,
 } from './dependencies';
+export { createReactScannerConfig } from './config';
+

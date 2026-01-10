@@ -3,12 +3,13 @@ import {
   isReactScannerInstalled,
   promptInstallReactScanner,
   installReactScanner,
-} from '../utils/dependencies';
+  createReactScannerConfig,
+} from '../utils';
 
 export function initCommand(program: Command): void {
   program
     .command('init')
-    .description('Coming soon')
+    .description('Initialize react-scanner configuration')
     .action(async () => {
       if (!isReactScannerInstalled()) {
         const shouldInstall = await promptInstallReactScanner();
@@ -19,6 +20,7 @@ export function initCommand(program: Command): void {
           process.exit(1);
         }
       }
-      console.log('Coming soon...');
+      createReactScannerConfig();
+      console.log('Initialization complete.');
     });
 }
