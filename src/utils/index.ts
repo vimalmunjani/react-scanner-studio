@@ -7,10 +7,4 @@ export {
 export { createReactScannerConfig } from "./config";
 export { getServerPort, isPortAvailable } from "./port";
 export type { PortOptions } from "./port";
-export {
-  readScannerConfig,
-  getOutputDir,
-  getLatestScanFile,
-  readScanData,
-  getScanData,
-} from "./scannerConfig";
+export { readScannerConfig, readScanData, getScanData } from "./scannerConfig";
