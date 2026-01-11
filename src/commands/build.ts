@@ -4,6 +4,7 @@ import { fileURLToPath } from 'url';
 import { writeFileSync, mkdirSync, existsSync } from 'fs';
 import { checkPeerDependency } from '../utils/dependencies.js';
 import { getScanData } from '../utils/scannerConfig.js';
+import { logger } from '../utils/index.js';
 
 // ESM equivalent of __dirname
 const __filename = fileURLToPath(import.meta.url);
@@ -29,24 +30,28 @@ async function runBuild(): Promise<void> {
   const consumerRoot = process.cwd();
   const outputDir = resolve(consumerRoot, '.react-scanner-ui');
 
-  console.log('\n📦 Building React Scanner UI...\n');
+  logger.infoBox('React Scanner UI', 'Building static files for production...');
 
   // Step 1: Get the scan data
-  console.log('   ➜  Reading scan data...');
+  logger.startSpinner('Reading scan data...');
   const scanResult = await getScanData();
 
   if (scanResult.error) {
-    console.error(`\n❌ Error: ${scanResult.error}`);
+    logger.spinnerError('Failed to read scan data');
+    logger.errorBox('Error', scanResult.error);
     process.exit(1);
   }
 
   if (!scanResult.data) {
-    console.error('\n❌ Error: No scan data found.');
+    logger.spinnerError('Failed to read scan data');
+    logger.errorBox('Error', 'No scan data found.');
     process.exit(1);
   }
 
+  logger.spinnerSuccess('Scan data loaded');
+
   // Step 2: Build the UI with Vite
-  console.log('   ➜  Building UI with Vite...');
+  logger.startSpinner('Building UI with Vite...');
 
   const { build } = await import('vite');
   const react = (await import('@vitejs/plugin-react')).default;
@@ -75,12 +80,15 @@ async function runBuild(): Promise<void> {
       logLevel: 'warn', // Reduce noise during build
     });
   } catch (error) {
-    console.error('\n❌ Vite build failed:', error);
+    logger.spinnerError('Vite build failed');
+    logger.errorBox('Build Error', String(error));
     process.exit(1);
   }
 
+  logger.spinnerSuccess('UI built successfully');
+
   // Step 3: Write the scan data as a JSON file
-  console.log('   ➜  Embedding scan data...');
+  logger.startSpinner('Embedding scan data...');
   const scanDataPath = resolve(outputDir, 'scan-data.json');
   writeFileSync(
     scanDataPath,
@@ -112,11 +120,10 @@ async function runBuild(): Promise<void> {
   indexHtml = indexHtml.replace('</head>', `${injectScript}</head>`);
   writeFileSync(indexPath, indexHtml);
 
-  console.log(`\n✅ Build complete! Output: ${outputDir}\n`);
-  console.log('   You can serve the static files with any web server:');
-  console.log(`   ➜  npx serve ${outputDir}`);
-  console.log(`   ➜  python -m http.server -d ${outputDir}`);
-  console.log('');
+  logger.spinnerSuccess('Scan data embedded');
+
+  // Display build complete message
+  logger.buildComplete(outputDir, [`npx serve ${outputDir}`]);
 }
 
 export function buildCommand(program: Command): void {

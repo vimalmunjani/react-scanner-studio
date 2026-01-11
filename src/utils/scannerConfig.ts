@@ -1,5 +1,6 @@
 import { existsSync, readFileSync } from 'fs';
 import { join, resolve } from 'path';
+import * as logger from './logger.js';
 
 export interface ScannerConfig {
   crawlFrom?: string;
@@ -22,8 +23,9 @@ export async function readScannerConfig(): Promise<ScannerConfig | null> {
   const configPath = join(process.cwd(), 'react-scanner.config.js');
 
   if (!existsSync(configPath)) {
-    console.error(
-      'react-scanner.config.js not found. Run `react-scanner-ui init` first.'
+    logger.errorBox(
+      'Configuration Not Found',
+      `${logger.bold('react-scanner.config.js')} not found.\nRun ${logger.bold('react-scanner-ui init')} first to create the configuration.`
     );
     return null;
   }
@@ -33,7 +35,10 @@ export async function readScannerConfig(): Promise<ScannerConfig | null> {
     const config = await import(configPath);
     return config.default || config;
   } catch (error) {
-    console.error('Failed to read react-scanner.config.js:', error);
+    logger.errorBox(
+      'Configuration Error',
+      `Failed to read react-scanner.config.js\n${error}`
+    );
     return null;
   }
 }
@@ -66,8 +71,10 @@ export function readScanData(filePath: string): ScanData | null {
   const absolutePath = resolve(process.cwd(), filePath);
 
   if (!existsSync(absolutePath)) {
-    console.error(`Scan data file not found: ${absolutePath}`);
-    console.error('Run react-scanner first to generate scan data.');
+    logger.errorBox(
+      'Scan Data Not Found',
+      `Scan data file not found: ${logger.bold(absolutePath)}\n\nRun ${logger.bold('npx react-scanner')} first to generate the scan data.`
+    );
     return null;
   }
 
@@ -75,7 +82,7 @@ export function readScanData(filePath: string): ScanData | null {
     const content = readFileSync(absolutePath, 'utf-8');
     return JSON.parse(content);
   } catch (error) {
-    console.error('Failed to read scan data:', error);
+    logger.errorBox('Parse Error', `Failed to read scan data: ${error}`);
     return null;
   }
 }

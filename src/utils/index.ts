@@ -12,3 +12,4 @@ export {
   readScanData,
   getScanData,
 } from './scannerConfig.js';
+export * as logger from './logger.js';

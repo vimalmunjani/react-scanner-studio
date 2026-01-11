@@ -1,11 +1,12 @@
 import { writeFileSync, existsSync } from 'fs';
 import { join } from 'path';
+import * as logger from './logger.js';
 
 export function createReactScannerConfig(): void {
   const configPath = join(process.cwd(), 'react-scanner.config.js');
 
   if (existsSync(configPath)) {
-    console.log('react-scanner.config.js already exists.');
+    logger.info('react-scanner.config.js already exists.');
     return;
   }
 
@@ -21,9 +22,14 @@ export function createReactScannerConfig(): void {
 
   try {
     writeFileSync(configPath, configContent);
-    console.log('Created react-scanner.config.js');
-    console.log('\n💡 Tip: Add .react-scanner-ui/ to your .gitignore file.');
+    logger.success('Created react-scanner.config.js');
+    logger.info(
+      `Tip: Add ${logger.bold('.react-scanner-ui/')} to your .gitignore file.`
+    );
   } catch (error) {
-    console.error('Failed to create react-scanner.config.js', error);
+    logger.errorBox(
+      'Configuration Error',
+      `Failed to create react-scanner.config.js\n${error}`
+    );
   }
 }

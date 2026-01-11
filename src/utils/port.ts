@@ -1,4 +1,5 @@
 import detectPort from 'detect-port';
+import * as logger from './logger.js';
 
 export interface PortOptions {
   exactPort?: boolean;
@@ -17,13 +18,19 @@ export async function getServerPort(
     const freePort = await detectPort(port);
 
     if (freePort !== port && exactPort) {
-      console.error(`Error: Port ${port} is not available.`);
+      logger.errorBox(
+        'Port Unavailable',
+        `Port ${logger.bold(String(port))} is not available.\nUse a different port or remove the --exact-port flag.`
+      );
       process.exit(1);
     }
 
     return freePort;
   } catch (error) {
-    console.error('Error detecting available port:', error);
+    logger.errorBox(
+      'Port Detection Error',
+      `Failed to detect available port: ${error}`
+    );
     process.exit(1);
   }
 }

@@ -6,6 +6,7 @@ import {
 import { resolve, dirname } from 'path';
 import { fileURLToPath } from 'url';
 import { getScanData } from '../utils/scannerConfig.js';
+import { logger } from '../utils/index.js';
 
 // ESM equivalent of __dirname
 const __filename = fileURLToPath(import.meta.url);
@@ -29,6 +30,8 @@ function getUiRoot(): string {
  * (similar approach to Storybook's builder-vite)
  */
 export async function startServer(port: number): Promise<void> {
+  logger.startSpinner('Starting development server...');
+
   // Dynamically import Vite to create dev server in middleware mode
   const { createServer: createViteServer } = await import('vite');
 
@@ -64,16 +67,18 @@ export async function startServer(port: number): Promise<void> {
 
   // Handle server errors
   server.on('error', (err: NodeJS.ErrnoException) => {
-    console.error('Server error:', err);
+    logger.spinnerError('Server error');
+    logger.errorBox('Server Error', err.message);
     vite.close();
     process.exit(1);
   });
 
   // Handle graceful shutdown
   const shutdown = async () => {
-    console.log('\nShutting down...');
+    logger.info('Shutting down server...');
     await vite.close();
     server.close();
+    logger.success('Server stopped gracefully');
     process.exit(0);
   };
 
@@ -84,11 +89,11 @@ export async function startServer(port: number): Promise<void> {
     server.on('error', reject);
 
     server.listen(port, '127.0.0.1', () => {
-      console.log(
-        `\n🚀 React Scanner UI is running at http://localhost:${port}\n`
-      );
-      console.log('   ➜  Hot Module Replacement enabled');
-      console.log('   ➜  Press Ctrl+C to stop the server.\n');
+      logger.spinnerSuccess('Server started');
+      logger.serverInfo(port, [
+        'Hot Module Replacement enabled',
+        'Press Ctrl+C to stop the server',
+      ]);
       resolvePromise();
     });
   });

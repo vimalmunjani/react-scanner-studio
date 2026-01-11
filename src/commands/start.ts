@@ -3,6 +3,7 @@ import { createInterface } from 'readline';
 import { checkPeerDependency } from '../utils/dependencies.js';
 import { getServerPort } from '../utils/port.js';
 import { startServer } from '../server/index.js';
+import { logger } from '../utils/index.js';
 
 const DEFAULT_PORT = 3000;
 
@@ -19,8 +20,11 @@ async function promptForPortChange(
   });
 
   return new Promise(resolve => {
+    logger.warning(
+      `Port ${logger.bold(String(requestedPort))} is not available.`
+    );
     rl.question(
-      `Port ${requestedPort} is not available. Would you like to run on port ${availablePort} instead? (Y/n): `,
+      `  Would you like to run on port ${logger.bold(String(availablePort))} instead? (Y/n): `,
       answer => {
         rl.close();
         const normalizedAnswer = answer.trim().toLowerCase();
@@ -56,13 +60,15 @@ async function openBrowser(url: string): Promise<void> {
 
     exec(command, error => {
       if (error) {
-        console.log(
-          `Could not open browser automatically. Please visit: ${url}`
+        logger.info(
+          `Could not open browser automatically. Please visit: ${logger.link(url)}`
         );
       }
     });
   } catch {
-    console.log(`Could not open browser automatically. Please visit: ${url}`);
+    logger.info(
+      `Could not open browser automatically. Please visit: ${logger.link(url)}`
+    );
   }
 }
 
@@ -88,8 +94,9 @@ export function startCommand(program: Command): void {
       const requestedPort = parseInt(options.port, 10);
 
       if (isNaN(requestedPort) || requestedPort < 1 || requestedPort > 65535) {
-        console.error(
-          'Error: Invalid port number. Please specify a port between 1 and 65535.'
+        logger.errorBox(
+          'Invalid Port',
+          'Please specify a port between 1 and 65535.'
         );
         process.exit(1);
       }
@@ -111,13 +118,13 @@ export function startCommand(program: Command): void {
         );
 
         if (!shouldChangePort) {
-          console.log('Exiting.');
+          logger.info('Exiting.');
           process.exit(1);
         }
       } else if (availablePort !== requestedPort && options.ci) {
         // In CI mode, just log the port change
-        console.log(
-          `Port ${requestedPort} is not available. Using port ${availablePort} instead.`
+        logger.warning(
+          `Port ${logger.bold(String(requestedPort))} is not available. Using port ${logger.bold(String(availablePort))} instead.`
         );
       }
 
@@ -130,7 +137,7 @@ export function startCommand(program: Command): void {
           await openBrowser(url);
         }
       } catch (error) {
-        console.error('Failed to start server:', error);
+        logger.errorBox('Server Error', `Failed to start server: ${error}`);
         process.exit(1);
       }
     });

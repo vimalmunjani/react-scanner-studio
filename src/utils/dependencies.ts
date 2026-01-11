@@ -2,6 +2,7 @@ import { existsSync, readFileSync } from 'fs';
 import { execSync } from 'child_process';
 import { createInterface } from 'readline';
 import { createRequire } from 'module';
+import * as logger from './logger.js';
 
 // ESM equivalent of require.resolve
 const require = createRequire(import.meta.url);
@@ -17,11 +18,11 @@ export function isReactScannerInstalled(): boolean {
 
 export function checkPeerDependency(): boolean {
   if (!isReactScannerInstalled()) {
-    console.error('Error: react-scanner is not installed.');
-    console.error('Please install it by running:');
-    console.error('  npm install react-scanner');
-    console.error('  or');
-    console.error('  yarn add react-scanner');
+    logger.errorBox(
+      'Missing Dependency: "react-scanner"',
+      'react-scanner is not installed.\nThis package is required to analyze your React components.'
+    );
+    logger.installInstructions('react-scanner');
     process.exit(1);
   }
   return true;
@@ -34,18 +35,20 @@ export async function promptInstallReactScanner(): Promise<boolean> {
   });
 
   return new Promise(resolve => {
-    rl.question(
-      'react-scanner is required. Would you like to install it? (y/n): ',
-      answer => {
-        rl.close();
-        resolve(answer.toLowerCase() === 'y' || answer.toLowerCase() === 'yes');
-      }
-    );
+    logger.warning('react-scanner is required but not installed.');
+    rl.question(`  Would you like to install it now? (Y/n): `, answer => {
+      rl.close();
+      resolve(
+        answer.toLowerCase() === 'y' ||
+          answer.toLowerCase() === 'yes' ||
+          answer === ''
+      );
+    });
   });
 }
 
 export function installReactScanner(): void {
-  console.log('Installing react-scanner...');
+  logger.startSpinner('Installing react-scanner...');
   try {
     const useYarn = existsSync('yarn.lock');
     let isWorkspace = false;
@@ -65,11 +68,13 @@ export function installReactScanner(): void {
       command = 'npm install react-scanner --save-dev';
     }
 
-    execSync(command, { stdio: 'inherit' });
-    console.log('react-scanner installed successfully!');
+    execSync(command, { stdio: 'pipe' });
+    logger.spinnerSuccess('react-scanner installed successfully!');
   } catch {
-    console.error(
-      'Failed to install react-scanner. Please install it manually.'
+    logger.spinnerError('Failed to install react-scanner');
+    logger.errorBox(
+      'Installation Failed',
+      'Could not install react-scanner automatically.\nPlease install it manually and try again.'
     );
     process.exit(1);
   }
