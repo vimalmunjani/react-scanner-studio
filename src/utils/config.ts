@@ -22,6 +22,7 @@ export function createReactScannerConfig(): void {
   try {
     writeFileSync(configPath, configContent);
     console.log('Created react-scanner.config.js');
+    console.log('\n💡 Tip: Add .react-scanner-ui/ to your .gitignore file.');
   } catch (error) {
     console.error('Failed to create react-scanner.config.js', error);
   }
