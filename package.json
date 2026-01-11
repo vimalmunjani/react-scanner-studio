@@ -3,6 +3,24 @@
   "type": "module",
   "version": "0.0.18",
   "main": "dist/index.js",
+  "keywords": [
+    "react",
+    "react-scanner",
+    "react-components",
+    "design-system",
+    "design-system-observability",
+    "component",
+    "component-usage",
+    "component-analytics",
+    "component-insights",
+    "component-metrics",
+    "statistics",
+    "usage-analytics",
+    "codebase-analysis",
+    "dashboard",
+    "visualization",
+    "ui"
+  ],
   "bin": {
     "react-scanner-ui": "dist/index.js"
   },

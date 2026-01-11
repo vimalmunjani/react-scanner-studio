@@ -5,16 +5,23 @@ A dashboard generator that transforms 'react-scanner' output into a portable, in
 <h1> React Scanner UI </h1>
 </div>
     
-[![npm version](https://badge.fury.io/js/react-scanner-ui.svg)](https://badge.fury.io/js/react-scanner-ui)
+[![npm version](https://img.shields.io/npm/v/react-scanner-ui.svg)](https://www.npmjs.com/package/react-scanner-ui)
 [![GitHub stars](https://img.shields.io/github/stars/vimalmunjani/react-scanner-ui?style=social)](https://github.com/vimalmunjani/react-scanner-ui/stargazers)
 
-## 🚀 First Release - February 1st, 2025
+## 🚀 First Release v1.0.0 - February 1st, 2025
 
-The initial version of React Scanner UI is launching February 1st! 
+The very first release of React Scanner UI (v1.0.0) is launching February 1st! 
 
 **Support the project:**
 - ⭐ [Star on GitHub](https://github.com/vimalmunjani/react-scanner-ui)
 - 💬 [Join Discussions](https://github.com/vimalmunjani/react-scanner-ui/discussions)
+- 🎮 [Join Discord](https://discord.gg/D7n5c7bj)
+
+## 📖 Documentation
+
+Visit our documentation site for usage guides and API reference:
+
+👉 **[https://vimalmunjani.github.io/react-scanner-ui/](https://vimalmunjani.github.io/react-scanner-ui/)**
 
 ## Installation
 
@@ -25,17 +32,6 @@ npm install react-scanner-ui
 # or
 npx react-scanner-ui
 ```
-
-## Usage
-
-```bash
-cd your-react-project
-react-scanner-ui init
-```
-
-## Documentation
-
-📖 [Full Documentation](https://vimalmunjani.github.io/react-scanner-ui/)
 
 ---
 
