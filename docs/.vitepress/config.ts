@@ -33,11 +33,16 @@ export default defineConfig({
         icon: 'github',
         link: 'https://github.com/vimalmunjani/react-scanner-ui',
       },
+      {
+        icon: 'linkedin',
+        link: 'https://www.linkedin.com/in/vimalmunjani/',
+      },
     ],
 
     footer: {
       message: 'Released under the MIT License.',
-      copyright: 'Created with ❤️ by Vimal Munjani',
+      copyright:
+        'Created with ❤️ by <a href="https://www.linkedin.com/in/vimalmunjani/" target="_blank">Vimal Munjani</a>',
     },
   },
 
