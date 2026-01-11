@@ -1,7 +1,12 @@
 #!/usr/bin/env node
 
 import { Command } from 'commander';
-import { infoCommand, initCommand, startCommand, buildCommand } from './commands';
+import {
+  infoCommand,
+  initCommand,
+  startCommand,
+  buildCommand,
+} from './commands';
 
 const program = new Command();
 

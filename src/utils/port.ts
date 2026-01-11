@@ -1,4 +1,4 @@
-import detectPort from "detect-port";
+import detectPort from 'detect-port';
 
 export interface PortOptions {
   exactPort?: boolean;
@@ -11,7 +11,7 @@ export interface PortOptions {
  */
 export async function getServerPort(
   port: number = 3000,
-  { exactPort }: PortOptions = {},
+  { exactPort }: PortOptions = {}
 ): Promise<number> {
   try {
     const freePort = await detectPort(port);
@@ -23,7 +23,7 @@ export async function getServerPort(
 
     return freePort;
   } catch (error) {
-    console.error("Error detecting available port:", error);
+    console.error('Error detecting available port:', error);
     process.exit(1);
   }
 }

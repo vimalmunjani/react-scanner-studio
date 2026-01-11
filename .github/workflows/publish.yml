@@ -2,7 +2,7 @@ name: Publish to npm
 
 on:
   workflow_run:
-    workflows: ["Version & Tag"]
+    workflows: ['Version & Tag']
     types:
       - completed
 
@@ -25,9 +25,9 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: 24          
+          node-version: 24
           registry-url: 'https://registry.npmjs.org'
-          cache: 'yarn'             
+          cache: 'yarn'
 
       - name: Update to latest npm
         run: npm install -g npm@latest

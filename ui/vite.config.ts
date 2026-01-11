@@ -1,6 +1,6 @@
-import { defineConfig } from "vite";
-import react from "@vitejs/plugin-react";
-import { resolve } from "path";
+import { defineConfig } from 'vite';
+import react from '@vitejs/plugin-react';
+import { resolve } from 'path';
 
 export default defineConfig({
   plugins: [react()],
@@ -9,14 +9,14 @@ export default defineConfig({
     port: 3000,
     open: false,
   },
-  appType: "spa",
+  appType: 'spa',
   resolve: {
     alias: {
-      "@": resolve(__dirname, "src"),
+      '@': resolve(__dirname, 'src'),
     },
   },
   build: {
-    outDir: resolve(__dirname, "../dist/ui"),
+    outDir: resolve(__dirname, '../dist/ui'),
     emptyOutDir: true,
   },
 });

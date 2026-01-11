@@ -1,8 +1,8 @@
-import { Command } from "commander";
-import { createInterface } from "readline";
-import { checkPeerDependency } from "../utils/dependencies";
-import { getServerPort, isPortAvailable } from "../utils/port";
-import { startServer } from "../server";
+import { Command } from 'commander';
+import { createInterface } from 'readline';
+import { checkPeerDependency } from '../utils/dependencies';
+import { getServerPort } from '../utils/port';
+import { startServer } from '../server';
 
 const DEFAULT_PORT = 3000;
 
@@ -11,26 +11,26 @@ const DEFAULT_PORT = 3000;
  */
 async function promptForPortChange(
   requestedPort: number,
-  availablePort: number,
+  availablePort: number
 ): Promise<boolean> {
   const rl = createInterface({
     input: process.stdin,
     output: process.stdout,
   });
 
-  return new Promise((resolve) => {
+  return new Promise(resolve => {
     rl.question(
       `Port ${requestedPort} is not available. Would you like to run on port ${availablePort} instead? (Y/n): `,
-      (answer) => {
+      answer => {
         rl.close();
         const normalizedAnswer = answer.trim().toLowerCase();
         // Default to yes if user just presses enter
         resolve(
-          normalizedAnswer === "" ||
-            normalizedAnswer === "y" ||
-            normalizedAnswer === "yes",
+          normalizedAnswer === '' ||
+            normalizedAnswer === 'y' ||
+            normalizedAnswer === 'yes'
         );
-      },
+      }
     );
   });
 }
@@ -42,22 +42,22 @@ async function openBrowser(url: string): Promise<void> {
   const { platform } = process;
 
   try {
-    const { exec } = await import("child_process");
+    const { exec } = await import('child_process');
 
     let command: string;
-    if (platform === "darwin") {
+    if (platform === 'darwin') {
       command = `open "${url}"`;
-    } else if (platform === "win32") {
+    } else if (platform === 'win32') {
       command = `start "" "${url}"`;
     } else {
       // Linux and other platforms
       command = `xdg-open "${url}"`;
     }
 
-    exec(command, (error) => {
+    exec(command, error => {
       if (error) {
         console.log(
-          `Could not open browser automatically. Please visit: ${url}`,
+          `Could not open browser automatically. Please visit: ${url}`
         );
       }
     });
@@ -68,28 +68,28 @@ async function openBrowser(url: string): Promise<void> {
 
 export function startCommand(program: Command): void {
   program
-    .command("start")
-    .description("Start the React Scanner UI server")
+    .command('start')
+    .description('Start the React Scanner UI server')
     .option(
-      "-p, --port <number>",
-      "Port to run the server on",
-      String(DEFAULT_PORT),
+      '-p, --port <number>',
+      'Port to run the server on',
+      String(DEFAULT_PORT)
     )
     .option(
-      "--exact-port",
-      "Exit if the specified port is not available",
-      false,
+      '--exact-port',
+      'Exit if the specified port is not available',
+      false
     )
-    .option("--ci", "Run in CI mode (no interactive prompts)", false)
-    .option("--open", "Open the browser automatically", false)
-    .action(async (options) => {
+    .option('--ci', 'Run in CI mode (no interactive prompts)', false)
+    .option('--open', 'Open the browser automatically', false)
+    .action(async options => {
       checkPeerDependency();
 
       const requestedPort = parseInt(options.port, 10);
 
       if (isNaN(requestedPort) || requestedPort < 1 || requestedPort > 65535) {
         console.error(
-          "Error: Invalid port number. Please specify a port between 1 and 65535.",
+          'Error: Invalid port number. Please specify a port between 1 and 65535.'
         );
         process.exit(1);
       }
@@ -107,17 +107,17 @@ export function startCommand(program: Command): void {
       ) {
         const shouldChangePort = await promptForPortChange(
           requestedPort,
-          availablePort,
+          availablePort
         );
 
         if (!shouldChangePort) {
-          console.log("Exiting.");
+          console.log('Exiting.');
           process.exit(1);
         }
       } else if (availablePort !== requestedPort && options.ci) {
         // In CI mode, just log the port change
         console.log(
-          `Port ${requestedPort} is not available. Using port ${availablePort} instead.`,
+          `Port ${requestedPort} is not available. Using port ${availablePort} instead.`
         );
       }
 
@@ -130,7 +130,7 @@ export function startCommand(program: Command): void {
           await openBrowser(url);
         }
       } catch (error) {
-        console.error("Failed to start server:", error);
+        console.error('Failed to start server:', error);
         process.exit(1);
       }
     });

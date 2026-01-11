@@ -1,0 +1,3 @@
+# Optional: Add commit message validation
+# Uncomment the lines below to enforce conventional commit messages
+# npx --no -- commitlint --edit $1

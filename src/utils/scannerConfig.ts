@@ -1,5 +1,5 @@
-import { existsSync, readFileSync } from "fs";
-import { join, resolve } from "path";
+import { existsSync, readFileSync } from 'fs';
+import { join, resolve } from 'path';
 
 export interface ScannerConfig {
   crawlFrom?: string;
@@ -18,23 +18,22 @@ export interface ScanData {
 /**
  * Read and parse the react-scanner.config.js file
  */
-export function readScannerConfig(): ScannerConfig | null {
-  const configPath = join(process.cwd(), "react-scanner.config.js");
+export async function readScannerConfig(): Promise<ScannerConfig | null> {
+  const configPath = join(process.cwd(), 'react-scanner.config.js');
 
   if (!existsSync(configPath)) {
     console.error(
-      "react-scanner.config.js not found. Run `react-scanner-ui init` first.",
+      'react-scanner.config.js not found. Run `react-scanner-ui init` first.'
     );
     return null;
   }
 
   try {
-    // Clear require cache to get fresh config
-    delete require.cache[require.resolve(configPath)];
-    const config = require(configPath);
-    return config;
+    // Use dynamic import for ES modules
+    const config = await import(configPath);
+    return config.default || config;
   } catch (error) {
-    console.error("Failed to read react-scanner.config.js:", error);
+    console.error('Failed to read react-scanner.config.js:', error);
     return null;
   }
 }
@@ -50,7 +49,7 @@ export function getOutputFile(config: ScannerConfig): string | null {
   for (const processor of config.processors) {
     if (
       Array.isArray(processor) &&
-      processor[0] === "count-components-and-props" &&
+      processor[0] === 'count-components-and-props' &&
       processor[1]?.outputTo
     ) {
       return processor[1].outputTo;
@@ -68,15 +67,15 @@ export function readScanData(filePath: string): ScanData | null {
 
   if (!existsSync(absolutePath)) {
     console.error(`Scan data file not found: ${absolutePath}`);
-    console.error("Run react-scanner first to generate scan data.");
+    console.error('Run react-scanner first to generate scan data.');
     return null;
   }
 
   try {
-    const content = readFileSync(absolutePath, "utf-8");
+    const content = readFileSync(absolutePath, 'utf-8');
     return JSON.parse(content);
   } catch (error) {
-    console.error("Failed to read scan data:", error);
+    console.error('Failed to read scan data:', error);
     return null;
   }
 }
@@ -84,10 +83,13 @@ export function readScanData(filePath: string): ScanData | null {
 /**
  * Get the scan data from the react-scanner output
  */
-export function getScanData(): { data: ScanData | null; error: string | null } {
-  const config = readScannerConfig();
+export async function getScanData(): Promise<{
+  data: ScanData | null;
+  error: string | null;
+}> {
+  const config = await readScannerConfig();
   if (!config) {
-    return { data: null, error: "Could not read react-scanner.config.js" };
+    return { data: null, error: 'Could not read react-scanner.config.js' };
   }
 
   const scanFile = getOutputFile(config);
@@ -95,13 +97,13 @@ export function getScanData(): { data: ScanData | null; error: string | null } {
     return {
       data: null,
       error:
-        "Could not find output file in config. Make sure you have a count-components-and-props processor configured with outputTo.",
+        'Could not find output file in config. Make sure you have a count-components-and-props processor configured with outputTo.',
     };
   }
 
   const data = readScanData(scanFile);
   if (!data) {
-    return { data: null, error: "Failed to parse scan data." };
+    return { data: null, error: 'Failed to parse scan data.' };
   }
 
   return { data, error: null };

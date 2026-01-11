@@ -1,11 +1,11 @@
-import { writeFileSync, existsSync } from "fs";
-import { join } from "path";
+import { writeFileSync, existsSync } from 'fs';
+import { join } from 'path';
 
 export function createReactScannerConfig(): void {
-  const configPath = join(process.cwd(), "react-scanner.config.js");
+  const configPath = join(process.cwd(), 'react-scanner.config.js');
 
   if (existsSync(configPath)) {
-    console.log("react-scanner.config.js already exists.");
+    console.log('react-scanner.config.js already exists.');
     return;
   }
 
@@ -21,8 +21,8 @@ export function createReactScannerConfig(): void {
 
   try {
     writeFileSync(configPath, configContent);
-    console.log("Created react-scanner.config.js");
+    console.log('Created react-scanner.config.js');
   } catch (error) {
-    console.error("Failed to create react-scanner.config.js", error);
+    console.error('Failed to create react-scanner.config.js', error);
   }
 }

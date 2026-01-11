@@ -29,11 +29,14 @@ export async function promptInstallReactScanner(): Promise<boolean> {
     output: process.stdout,
   });
 
-  return new Promise((resolve) => {
-    rl.question('react-scanner is required. Would you like to install it? (y/n): ', (answer) => {
-      rl.close();
-      resolve(answer.toLowerCase() === 'y' || answer.toLowerCase() === 'yes');
-    });
+  return new Promise(resolve => {
+    rl.question(
+      'react-scanner is required. Would you like to install it? (y/n): ',
+      answer => {
+        rl.close();
+        resolve(answer.toLowerCase() === 'y' || answer.toLowerCase() === 'yes');
+      }
+    );
   });
 }
 
@@ -60,8 +63,10 @@ export function installReactScanner(): void {
 
     execSync(command, { stdio: 'inherit' });
     console.log('react-scanner installed successfully!');
-  } catch (error) {
-    console.error('Failed to install react-scanner. Please install it manually.');
+  } catch {
+    console.error(
+      'Failed to install react-scanner. Please install it manually.'
+    );
     process.exit(1);
   }
 }

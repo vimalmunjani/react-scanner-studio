@@ -1,13 +1,13 @@
-import { useState } from "react";
-import type { ScanData } from "./App";
-import "./ComponentTable.css";
+import { useState } from 'react';
+import type { ScanData } from './App';
+import './ComponentTable.css';
 
 interface ComponentTableProps {
   data: ScanData;
 }
 
-type SortKey = "name" | "count";
-type SortDirection = "asc" | "desc";
+type SortKey = 'name' | 'count';
+type SortDirection = 'asc' | 'desc';
 
 interface SortConfig {
   key: SortKey;
@@ -16,25 +16,25 @@ interface SortConfig {
 
 export function ComponentTable({ data }: ComponentTableProps) {
   const [sortConfig, setSortConfig] = useState<SortConfig>({
-    key: "count",
-    direction: "desc",
+    key: 'count',
+    direction: 'desc',
   });
   const [expandedRows, setExpandedRows] = useState<Set<string>>(new Set());
 
   const handleSort = (key: SortKey) => {
-    setSortConfig((prev) => ({
+    setSortConfig(prev => ({
       key,
-      direction: prev.key === key && prev.direction === "asc" ? "desc" : "asc",
+      direction: prev.key === key && prev.direction === 'asc' ? 'desc' : 'asc',
     }));
   };
 
   const getSortIndicator = (key: SortKey) => {
-    if (sortConfig.key !== key) return "";
-    return sortConfig.direction === "asc" ? "▲" : "▼";
+    if (sortConfig.key !== key) return '';
+    return sortConfig.direction === 'asc' ? '▲' : '▼';
   };
 
   const toggleRow = (name: string) => {
-    setExpandedRows((prev) => {
+    setExpandedRows(prev => {
       const next = new Set(prev);
       if (next.has(name)) {
         next.delete(name);
@@ -53,43 +53,43 @@ export function ComponentTable({ data }: ComponentTableProps) {
   }));
 
   components.sort((a, b) => {
-    const aValue = sortConfig.key === "name" ? a.name.toLowerCase() : a.count;
-    const bValue = sortConfig.key === "name" ? b.name.toLowerCase() : b.count;
+    const aValue = sortConfig.key === 'name' ? a.name.toLowerCase() : a.count;
+    const bValue = sortConfig.key === 'name' ? b.name.toLowerCase() : b.count;
 
-    if (aValue < bValue) return sortConfig.direction === "asc" ? -1 : 1;
-    if (aValue > bValue) return sortConfig.direction === "asc" ? 1 : -1;
+    if (aValue < bValue) return sortConfig.direction === 'asc' ? -1 : 1;
+    if (aValue > bValue) return sortConfig.direction === 'asc' ? 1 : -1;
     return 0;
   });
 
   const totalCount = components.reduce((sum, c) => sum + c.count, 0);
 
   if (components.length === 0) {
-    return <div className="empty-state">No components found in scan data.</div>;
+    return <div className='empty-state'>No components found in scan data.</div>;
   }
 
   return (
-    <div className="table-container">
-      <table className="component-table">
+    <div className='table-container'>
+      <table className='component-table'>
         <thead>
           <tr>
-            <th onClick={() => handleSort("name")}>
+            <th onClick={() => handleSort('name')}>
               Component
-              <span className="sort-indicator">{getSortIndicator("name")}</span>
+              <span className='sort-indicator'>{getSortIndicator('name')}</span>
             </th>
-            <th onClick={() => handleSort("count")}>
+            <th onClick={() => handleSort('count')}>
               Usage Count
-              <span className="sort-indicator">
-                {getSortIndicator("count")}
+              <span className='sort-indicator'>
+                {getSortIndicator('count')}
               </span>
             </th>
           </tr>
         </thead>
         <tbody>
-          {components.map((component) => {
+          {components.map(component => {
             const isExpanded = expandedRows.has(component.name);
             const hasProps = Object.keys(component.props).length > 0;
             const sortedProps = Object.entries(component.props).sort(
-              ([, a], [, b]) => b - a,
+              ([, a], [, b]) => b - a
             );
 
             return (
@@ -97,28 +97,28 @@ export function ComponentTable({ data }: ComponentTableProps) {
                 <tr
                   key={component.name}
                   onClick={() => toggleRow(component.name)}
-                  className={`clickable-row ${isExpanded ? "expanded" : ""} ${hasProps ? "has-props" : ""}`}
+                  className={`clickable-row ${isExpanded ? 'expanded' : ''} ${hasProps ? 'has-props' : ''}`}
                 >
-                  <td className="component-name">
+                  <td className='component-name'>
                     <span
-                      className={`expand-icon ${isExpanded ? "expanded" : ""}`}
+                      className={`expand-icon ${isExpanded ? 'expanded' : ''}`}
                     >
-                      {hasProps ? "▶" : ""}
+                      {hasProps ? '▶' : ''}
                     </span>
                     {component.name}
                   </td>
-                  <td className="count">{component.count}</td>
+                  <td className='count'>{component.count}</td>
                 </tr>
                 {isExpanded && hasProps && (
-                  <tr key={`${component.name}-props`} className="props-row">
+                  <tr key={`${component.name}-props`} className='props-row'>
                     <td colSpan={2}>
-                      <div className="props-container">
-                        <span className="props-label">Props:</span>
-                        <div className="props-chips">
+                      <div className='props-container'>
+                        <span className='props-label'>Props:</span>
+                        <div className='props-chips'>
                           {sortedProps.map(([propName, propCount]) => (
-                            <span key={propName} className="prop-chip">
+                            <span key={propName} className='prop-chip'>
                               {propName}
-                              <span className="prop-count">{propCount}</span>
+                              <span className='prop-count'>{propCount}</span>
                             </span>
                           ))}
                         </div>
@@ -129,9 +129,9 @@ export function ComponentTable({ data }: ComponentTableProps) {
               </>
             );
           })}
-          <tr className="total-row">
+          <tr className='total-row'>
             <td>Total</td>
-            <td className="count">{totalCount}</td>
+            <td className='count'>{totalCount}</td>
           </tr>
         </tbody>
       </table>

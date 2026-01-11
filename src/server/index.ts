@@ -2,9 +2,9 @@ import {
   createServer as createHttpServer,
   IncomingMessage,
   ServerResponse,
-} from "http";
-import { resolve } from "path";
-import { getScanData } from "../utils/scannerConfig";
+} from 'http';
+import { resolve } from 'path';
+import { getScanData } from '../utils/scannerConfig';
 
 /**
  * Get the path to the UI directory.
@@ -16,7 +16,7 @@ function getUiRoot(): string {
   const currentDir = __dirname;
 
   // Go up from server/ to src/ or dist/, then up to project root, then into ui/
-  return resolve(currentDir, "../../ui");
+  return resolve(currentDir, '../../ui');
 }
 
 /**
@@ -25,65 +25,65 @@ function getUiRoot(): string {
  */
 export async function startServer(port: number): Promise<void> {
   // Dynamically import Vite to create dev server in middleware mode
-  const { createServer: createViteServer } = await import("vite");
+  const { createServer: createViteServer } = await import('vite');
 
   const uiRoot = getUiRoot();
 
   const vite = await createViteServer({
     root: uiRoot,
-    configFile: resolve(uiRoot, "vite.config.ts"),
+    configFile: resolve(uiRoot, 'vite.config.ts'),
     server: {
       middlewareMode: true,
     },
-    appType: "spa",
+    appType: 'spa',
   });
 
   // Create HTTP server with manual routing
   const server = createHttpServer(
-    (req: IncomingMessage, res: ServerResponse) => {
-      const url = req.url || "";
+    async (req: IncomingMessage, res: ServerResponse) => {
+      const url = req.url || '';
 
       // Handle API routes FIRST - before Vite middleware
-      if (url === "/api/scan-data" || url.startsWith("/api/scan-data?")) {
-        res.setHeader("Content-Type", "application/json");
-        res.setHeader("Cache-Control", "no-cache");
-        const result = getScanData();
+      if (url === '/api/scan-data' || url.startsWith('/api/scan-data?')) {
+        res.setHeader('Content-Type', 'application/json');
+        res.setHeader('Cache-Control', 'no-cache');
+        const result = await getScanData();
         res.end(JSON.stringify(result));
         return;
       }
 
       // Pass everything else to Vite
       vite.middlewares(req, res);
-    },
+    }
   );
 
   // Handle server errors
-  server.on("error", (err: NodeJS.ErrnoException) => {
-    console.error("Server error:", err);
+  server.on('error', (err: NodeJS.ErrnoException) => {
+    console.error('Server error:', err);
     vite.close();
     process.exit(1);
   });
 
   // Handle graceful shutdown
   const shutdown = async () => {
-    console.log("\nShutting down...");
+    console.log('\nShutting down...');
     await vite.close();
     server.close();
     process.exit(0);
   };
 
-  process.on("SIGINT", shutdown);
-  process.on("SIGTERM", shutdown);
+  process.on('SIGINT', shutdown);
+  process.on('SIGTERM', shutdown);
 
   return new Promise((resolvePromise, reject) => {
-    server.on("error", reject);
+    server.on('error', reject);
 
-    server.listen(port, "127.0.0.1", () => {
+    server.listen(port, '127.0.0.1', () => {
       console.log(
-        `\n🚀 React Scanner UI is running at http://localhost:${port}\n`,
+        `\n🚀 React Scanner UI is running at http://localhost:${port}\n`
       );
-      console.log("   ➜  Hot Module Replacement enabled");
-      console.log("   ➜  Press Ctrl+C to stop the server.\n");
+      console.log('   ➜  Hot Module Replacement enabled');
+      console.log('   ➜  Press Ctrl+C to stop the server.\n');
       resolvePromise();
     });
   });
