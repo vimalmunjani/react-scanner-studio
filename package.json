@@ -78,6 +78,9 @@
     "typescript": "^5.9.3",
     "vitepress": "^1.6.4"
   },
+  "peerDependencies": {
+    "react-scanner": ">=1.2.0"
+  },
   "lint-staged": {
     "*.{ts,tsx,js,jsx}": [
       "eslint --fix",
