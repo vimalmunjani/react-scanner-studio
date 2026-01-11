@@ -1,8 +1,8 @@
 import { Command } from 'commander';
 import { createInterface } from 'readline';
-import { checkPeerDependency } from '../utils/dependencies';
-import { getServerPort } from '../utils/port';
-import { startServer } from '../server';
+import { checkPeerDependency } from '../utils/dependencies.js';
+import { getServerPort } from '../utils/port.js';
+import { startServer } from '../server/index.js';
 
 const DEFAULT_PORT = 3000;
 

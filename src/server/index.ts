@@ -3,8 +3,13 @@ import {
   IncomingMessage,
   ServerResponse,
 } from 'http';
-import { resolve } from 'path';
-import { getScanData } from '../utils/scannerConfig';
+import { resolve, dirname } from 'path';
+import { fileURLToPath } from 'url';
+import { getScanData } from '../utils/scannerConfig.js';
+
+// ESM equivalent of __dirname
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = dirname(__filename);
 
 /**
  * Get the path to the UI directory.

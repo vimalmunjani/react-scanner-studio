@@ -1,6 +1,10 @@
 import { existsSync, readFileSync } from 'fs';
 import { execSync } from 'child_process';
 import { createInterface } from 'readline';
+import { createRequire } from 'module';
+
+// ESM equivalent of require.resolve
+const require = createRequire(import.meta.url);
 
 export function isReactScannerInstalled(): boolean {
   try {

@@ -3,8 +3,12 @@ export {
   checkPeerDependency,
   promptInstallReactScanner,
   installReactScanner,
-} from './dependencies';
-export { createReactScannerConfig } from './config';
-export { getServerPort, isPortAvailable } from './port';
-export type { PortOptions } from './port';
-export { readScannerConfig, readScanData, getScanData } from './scannerConfig';
+} from './dependencies.js';
+export { createReactScannerConfig } from './config.js';
+export { getServerPort, isPortAvailable } from './port.js';
+export type { PortOptions } from './port.js';
+export {
+  readScannerConfig,
+  readScanData,
+  getScanData,
+} from './scannerConfig.js';

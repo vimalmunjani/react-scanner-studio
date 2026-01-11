@@ -6,7 +6,7 @@ import {
   initCommand,
   startCommand,
   buildCommand,
-} from './commands';
+} from './commands/index.js';
 
 const program = new Command();
 

@@ -4,7 +4,7 @@ import {
   promptInstallReactScanner,
   installReactScanner,
   createReactScannerConfig,
-} from '../utils';
+} from '../utils/index.js';
 
 export function initCommand(program: Command): void {
   program

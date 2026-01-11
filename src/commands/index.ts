@@ -1,4 +1,4 @@
-export { infoCommand } from './info';
-export { initCommand } from './init';
-export { startCommand } from './start';
-export { buildCommand } from './build';
+export { infoCommand } from './info.js';
+export { initCommand } from './init.js';
+export { startCommand } from './start.js';
+export { buildCommand } from './build.js';
