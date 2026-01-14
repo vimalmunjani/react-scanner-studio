@@ -18,6 +18,11 @@ export function isReactScannerInstalled(): boolean {
 }
 
 export function checkPeerDependency(): boolean {
+  const isLinked = !import.meta.url.includes('node_modules');
+  if (isLinked) {
+    return true;
+  }
+
   if (!isReactScannerInstalled()) {
     logger.errorBox(
       'Missing Dependency: "react-scanner"',
