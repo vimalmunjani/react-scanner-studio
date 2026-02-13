@@ -97,13 +97,13 @@ async function handleScanReport(ciMode: boolean): Promise<boolean> {
       return true;
     }
 
-    const useExisting = await confirm({
-      message: 'Use existing report? (No to generate a new one)',
-      default: true,
+    const generateNew = await confirm({
+      message: 'Generate a new report?',
+      default: false,
       theme: inquirerTheme,
     });
 
-    if (useExisting) {
+    if (!generateNew) {
       return true;
     }
 

@@ -1,18 +1,21 @@
 import { defineConfig } from 'vite';
 import react from '@vitejs/plugin-react';
+import tailwindcss from '@tailwindcss/vite';
 import { resolve } from 'path';
 
 export default defineConfig({
-  plugins: [react()],
+  plugins: [react(), tailwindcss()],
   root: resolve(__dirname),
   server: {
-    port: 3000,
+    // Port is configured dynamically by the server when running in middleware mode
     open: false,
   },
   appType: 'spa',
   resolve: {
     alias: {
-      '@': resolve(__dirname, 'src'),
+      '@/components': resolve(__dirname, 'components'),
+      '@/lib': resolve(__dirname, 'components/lib'),
+      '@/hooks': resolve(__dirname, 'components/hooks'),
     },
   },
   build: {

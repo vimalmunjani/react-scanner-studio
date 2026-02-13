@@ -11,7 +11,6 @@ export default defineConfig({
     nav: [
       { text: 'Home', link: '/' },
       { text: 'Quick Start', link: '/quick-start/' },
-      { text: 'Guide', link: '/guide/' },
       { text: 'CLI Reference', link: '/cli/' },
       { text: 'Configuration', link: '/configuration/' },
     ],

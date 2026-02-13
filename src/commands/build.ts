@@ -67,13 +67,13 @@ async function handleScanReport(ciMode: boolean): Promise<boolean> {
       return true;
     }
 
-    const useExisting = await confirm({
-      message: 'Use existing report? (No to generate a new one)',
-      default: true,
+    const generateNew = await confirm({
+      message: 'Generate a new report?',
+      default: false,
       theme: inquirerTheme,
     });
 
-    if (useExisting) {
+    if (!generateNew) {
       return true;
     }
 
@@ -154,6 +154,7 @@ async function runBuild(): Promise<void> {
 
   const { build } = await import('vite');
   const react = (await import('@vitejs/plugin-react')).default;
+  const tailwindcss = (await import('@tailwindcss/vite')).default;
 
   const uiRoot = getUiRoot();
 
@@ -170,7 +171,7 @@ async function runBuild(): Promise<void> {
   try {
     await build({
       root: uiRoot,
-      plugins: [react()],
+      plugins: [react(), tailwindcss()],
       base: './', // Use relative paths for assets
       build: {
         outDir: outputDir,
@@ -178,7 +179,9 @@ async function runBuild(): Promise<void> {
       },
       resolve: {
         alias: {
-          '@': resolve(uiRoot, 'src'),
+          '@/components': resolve(uiRoot, 'components'),
+          '@/lib': resolve(uiRoot, 'components/lib'),
+          '@/hooks': resolve(uiRoot, 'components/hooks'),
         },
       },
       logLevel: 'warn', // Reduce noise during build

@@ -11,10 +11,10 @@ hero:
   actions:
     - theme: brand
       text: Get Started
-      link: /guide/
+      link: /quick-start/
     - theme: alt
-      text: View on GitHub
-      link: https://github.com/vimalmunjani/react-scanner-studio
+      text: See Demo
+      link: https://demo.reactscanner.studio
 
 features:
   - icon: 🔍

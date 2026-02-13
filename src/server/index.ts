@@ -37,33 +37,41 @@ export async function startServer(port: number): Promise<void> {
 
   const uiRoot = getUiRoot();
 
+  // Create HTTP server first
+  const server = createHttpServer();
+
+  // Create Vite dev server with HMR configured to use our HTTP server
+  // This ensures the WebSocket server uses the same port as the HTTP server
   const vite = await createViteServer({
     root: uiRoot,
     configFile: resolve(uiRoot, 'vite.config.ts'),
     server: {
       middlewareMode: true,
+      hmr: {
+        // Attach HMR WebSocket to our HTTP server instead of creating a new one
+        server,
+        port,
+      },
     },
     appType: 'spa',
   });
 
-  // Create HTTP server with manual routing
-  const server = createHttpServer(
-    async (req: IncomingMessage, res: ServerResponse) => {
-      const url = req.url || '';
+  // Set up request handler
+  server.on('request', async (req: IncomingMessage, res: ServerResponse) => {
+    const url = req.url || '';
 
-      // Handle API routes FIRST - before Vite middleware
-      if (url === '/api/scan-data' || url.startsWith('/api/scan-data?')) {
-        res.setHeader('Content-Type', 'application/json');
-        res.setHeader('Cache-Control', 'no-cache');
-        const result = await getScanData();
-        res.end(JSON.stringify(result));
-        return;
-      }
-
-      // Pass everything else to Vite
-      vite.middlewares(req, res);
+    // Handle API routes FIRST - before Vite middleware
+    if (url === '/api/scan-data' || url.startsWith('/api/scan-data?')) {
+      res.setHeader('Content-Type', 'application/json');
+      res.setHeader('Cache-Control', 'no-cache');
+      const result = await getScanData();
+      res.end(JSON.stringify(result));
+      return;
     }
-  );
+
+    // Pass everything else to Vite
+    vite.middlewares(req, res);
+  });
 
   // Handle server errors
   server.on('error', (err: NodeJS.ErrnoException) => {
