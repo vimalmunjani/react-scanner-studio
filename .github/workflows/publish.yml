@@ -47,5 +47,20 @@ jobs:
       - name: Build library
         run: yarn build
 
+      - name: Determine npm publish tag
+        id: npm-tag
+        run: |
+          VERSION=$(node -p "require('./package.json').version")
+          echo "version=$VERSION" >> $GITHUB_OUTPUT
+          if [[ "$VERSION" == *"-"* ]]; then
+            # Prerelease version (contains hyphen, e.g., 1.0.0-beta.1)
+            PRERELEASE_TYPE=$(echo "$VERSION" | sed 's/.*-\([a-zA-Z]*\).*/\1/')
+            echo "tag=$PRERELEASE_TYPE" >> $GITHUB_OUTPUT
+            echo "Detected prerelease version: $VERSION, using tag: $PRERELEASE_TYPE"
+          else
+            echo "tag=latest" >> $GITHUB_OUTPUT
+            echo "Detected stable version: $VERSION, using tag: latest"
+          fi
+
       - name: Publish with provenance (OIDC mode)
-        run: npm publish --provenance --access public --verbose
+        run: npm publish --provenance --access public --tag ${{ steps.npm-tag.outputs.tag }} --verbose
