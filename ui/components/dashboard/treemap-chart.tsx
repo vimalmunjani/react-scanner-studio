@@ -78,7 +78,8 @@ export function TreemapChart() {
 
   const data = useMemo(() => {
     if (!report) return [];
-    return report.components.map(c => ({
+    // Limit to top 50 components for performance
+    return report.components.slice(0, 50).map(c => ({
       name: c.name,
       size: c.instances,
     }));
@@ -93,7 +94,7 @@ export function TreemapChart() {
           Usage Distribution
         </h2>
         <span className='text-xs text-muted-foreground'>
-          Area proportional to usage
+          Top {data.length} components by usage
         </span>
       </div>
       <div className='h-[320px]'>

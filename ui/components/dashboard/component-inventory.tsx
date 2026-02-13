@@ -2,14 +2,28 @@ import { useState, useMemo } from 'react';
 import {
   ArrowUpDown,
   ChevronRight,
+  ChevronLeft,
   Search,
   Package,
   Filter,
 } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
+import {
+  Tooltip,
+  TooltipTrigger,
+  TooltipContent,
+  TooltipProvider,
+} from '@/components/ui/tooltip';
 import { useReport } from '@/lib/report-context';
 import type { NormalizedComponent } from '@/lib/report-types';
+
+const MAX_NAME_LENGTH = 24;
+
+function truncateName(name: string, maxLength: number = MAX_NAME_LENGTH) {
+  if (name.length <= maxLength) return name;
+  return name.slice(0, maxLength - 1) + '…';
+}
 
 type SortKey = 'name' | 'instances' | 'props' | 'files' | 'propsSpread';
 type SortDir = 'asc' | 'desc';
@@ -47,6 +61,8 @@ export function ComponentInventory() {
   const [sortDir, setSortDir] = useState<SortDir>('desc');
   const [search, setSearch] = useState('');
   const [minInstances, setMinInstances] = useState(0);
+  const [currentPage, setCurrentPage] = useState(1);
+  const pageSize = 50;
 
   const sorted = useMemo(() => {
     if (!report) return [];
@@ -85,6 +101,13 @@ export function ComponentInventory() {
     });
   }, [report, sortKey, sortDir, search, minInstances]);
 
+  // Paginated data
+  const totalPages = Math.ceil(sorted.length / pageSize);
+  const paginatedData = useMemo(() => {
+    const start = (currentPage - 1) * pageSize;
+    return sorted.slice(start, start + pageSize);
+  }, [sorted, currentPage, pageSize]);
+
   if (!report) return null;
 
   const toggleSort = (key: SortKey) => {
@@ -94,6 +117,21 @@ export function ComponentInventory() {
       setSortKey(key);
       setSortDir('desc');
     }
+    setCurrentPage(1);
+  };
+
+  const handleSearchChange = (value: string) => {
+    setSearch(value);
+    setCurrentPage(1);
+  };
+
+  const handleMinInstancesChange = (value: number) => {
+    setMinInstances(Math.max(0, value));
+    setCurrentPage(1);
+  };
+
+  const goToPage = (page: number) => {
+    setCurrentPage(Math.max(1, Math.min(page, totalPages)));
   };
 
   const maxInstances = Math.max(...report.components.map(c => c.instances), 1);
@@ -167,168 +205,268 @@ export function ComponentInventory() {
   };
 
   return (
-    <div className='flex flex-col gap-6'>
-      {/* Header */}
-      <div className='flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between'>
-        <div className='flex items-center gap-3'>
-          <div className='flex items-center justify-center w-9 h-9 rounded-lg bg-muted'>
-            <Package className='w-4.5 h-4.5 text-foreground' />
+    <TooltipProvider delayDuration={100}>
+      <div className='flex flex-col gap-6'>
+        {/* Header */}
+        <div className='flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between'>
+          <div className='flex items-center gap-3'>
+            <div className='flex items-center justify-center w-9 h-9 rounded-lg bg-muted'>
+              <Package className='w-4.5 h-4.5 text-foreground' />
+            </div>
+            <div>
+              <h1 className='text-lg font-semibold text-foreground font-sans'>
+                Component Inventory
+              </h1>
+              <p className='text-xs text-muted-foreground mt-0.5'>
+                Showing {paginatedData.length} of {sorted.length} components
+                {search || minInstances > 0 ? ' (filtered)' : ''}
+              </p>
+            </div>
           </div>
-          <div>
-            <h1 className='text-lg font-semibold text-foreground font-sans'>
-              Component Inventory
-            </h1>
-            <p className='text-xs text-muted-foreground mt-0.5'>
-              {sorted.length} of {report.totalUniqueComponents} components
-              {search || minInstances > 0 ? ' (filtered)' : ''}
-            </p>
+        </div>
+
+        {/* Filters */}
+        <div className='flex flex-col gap-3 sm:flex-row sm:items-center'>
+          <div className='relative flex-1 max-w-sm'>
+            <Search className='absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground' />
+            <Input
+              placeholder='Search components...'
+              value={search}
+              onChange={e => handleSearchChange(e.target.value)}
+              className='pl-9 h-9 text-sm bg-card border-border'
+            />
+          </div>
+          <div className='flex items-center gap-2'>
+            <Filter className='w-3.5 h-3.5 text-muted-foreground' />
+            <span className='text-xs text-muted-foreground'>
+              Min instances:
+            </span>
+            <Input
+              type='number'
+              min={0}
+              value={minInstances}
+              onChange={e => handleMinInstancesChange(Number(e.target.value))}
+              className='w-20 h-9 text-sm bg-card border-border tabular-nums'
+            />
           </div>
         </div>
-      </div>
 
-      {/* Filters */}
-      <div className='flex flex-col gap-3 sm:flex-row sm:items-center'>
-        <div className='relative flex-1 max-w-sm'>
-          <Search className='absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground' />
-          <Input
-            placeholder='Search components...'
-            value={search}
-            onChange={e => setSearch(e.target.value)}
-            className='pl-9 h-9 text-sm bg-card border-border'
-          />
-        </div>
-        <div className='flex items-center gap-2'>
-          <Filter className='w-3.5 h-3.5 text-muted-foreground' />
-          <span className='text-xs text-muted-foreground'>Min instances:</span>
-          <Input
-            type='number'
-            min={0}
-            value={minInstances}
-            onChange={e => setMinInstances(Math.max(0, Number(e.target.value)))}
-            className='w-20 h-9 text-sm bg-card border-border tabular-nums'
-          />
-        </div>
-      </div>
-
-      {/* Table */}
-      <div className='rounded-lg border border-border bg-card overflow-hidden'>
-        <div className='overflow-x-auto'>
-          <table className='w-full'>
-            <thead>
-              <tr className='border-b border-border bg-muted/30'>
-                <th className='text-left p-3 pl-5'>
-                  <SortHeader
-                    label='Component'
-                    sortKeyName='name'
-                    sortKey={sortKey}
-                    onToggleSort={toggleSort}
-                  />
-                </th>
-                <th className='text-left p-3'>
-                  <SortHeader
-                    label='Instances'
-                    sortKeyName='instances'
-                    sortKey={sortKey}
-                    onToggleSort={toggleSort}
-                  />
-                </th>
-                <th className='text-left p-3'>
-                  <SortHeader
-                    label='Props'
-                    sortKeyName='props'
-                    sortKey={sortKey}
-                    onToggleSort={toggleSort}
-                  />
-                </th>
-                <th className='text-left p-3 hidden lg:table-cell'>
-                  <span className='text-xs font-medium text-muted-foreground uppercase tracking-wide'>
-                    Prop Names
-                  </span>
-                </th>
-                {report.format === 'raw-report' && (
-                  <>
-                    <th className='text-left p-3 hidden md:table-cell'>
-                      <SortHeader
-                        label='Files'
-                        sortKeyName='files'
-                        sortKey={sortKey}
-                        onToggleSort={toggleSort}
-                      />
-                    </th>
-                    <th className='text-left p-3 hidden lg:table-cell'>
-                      <SortHeader
-                        label='Spread'
-                        sortKeyName='propsSpread'
-                        sortKey={sortKey}
-                        onToggleSort={toggleSort}
-                      />
-                    </th>
-                  </>
-                )}
-                <th className='p-3 w-10' />
-              </tr>
-            </thead>
-            <tbody>
-              {sorted.map(component => (
-                <tr
-                  key={component.name}
-                  className='border-b border-border last:border-b-0 hover:bg-accent/50 transition-colors cursor-pointer group'
-                  onClick={() => setSelectedComponent(component)}
-                >
-                  <td className='p-3 pl-5'>
-                    <div className='flex items-center gap-2'>
-                      <span className='text-sm font-mono font-medium text-foreground'>
-                        {'<'}
-                        {component.name}
-                        {' />'}
-                      </span>
-                      {component.propsSpreadCount > 0 && (
-                        <Badge
-                          variant='secondary'
-                          className='text-[9px] px-1 py-0'
-                        >
-                          spread
-                        </Badge>
-                      )}
-                    </div>
-                  </td>
-                  <td className='p-3'>{renderInstanceBar(component)}</td>
-                  <td className='p-3'>{renderPropBar(component)}</td>
-                  <td className='p-3 hidden lg:table-cell'>
-                    {renderPropNames(component)}
-                  </td>
+        {/* Table */}
+        <div className='rounded-lg border border-border bg-card overflow-hidden'>
+          <div className='overflow-x-auto'>
+            <table className='w-full'>
+              <thead>
+                <tr className='border-b border-border bg-muted/30'>
+                  <th className='text-left p-3 pl-5'>
+                    <SortHeader
+                      label='Component'
+                      sortKeyName='name'
+                      sortKey={sortKey}
+                      onToggleSort={toggleSort}
+                    />
+                  </th>
+                  <th className='text-left p-3'>
+                    <SortHeader
+                      label='Instances'
+                      sortKeyName='instances'
+                      sortKey={sortKey}
+                      onToggleSort={toggleSort}
+                    />
+                  </th>
+                  <th className='text-left p-3'>
+                    <SortHeader
+                      label='Props'
+                      sortKeyName='props'
+                      sortKey={sortKey}
+                      onToggleSort={toggleSort}
+                    />
+                  </th>
+                  <th className='text-left p-3 hidden lg:table-cell'>
+                    <span className='text-xs font-medium text-muted-foreground uppercase tracking-wide'>
+                      Prop Names
+                    </span>
+                  </th>
                   {report.format === 'raw-report' && (
                     <>
-                      <td className='p-3 hidden md:table-cell'>
-                        <span className='text-sm tabular-nums text-muted-foreground'>
-                          {component.files.length > 0
-                            ? component.files.length
-                            : '--'}
-                        </span>
-                      </td>
-                      <td className='p-3 hidden lg:table-cell'>
-                        <span className='text-sm tabular-nums text-muted-foreground'>
-                          {component.propsSpreadCount > 0
-                            ? component.propsSpreadCount
-                            : '--'}
-                        </span>
-                      </td>
+                      <th className='text-left p-3 hidden md:table-cell'>
+                        <SortHeader
+                          label='Files'
+                          sortKeyName='files'
+                          sortKey={sortKey}
+                          onToggleSort={toggleSort}
+                        />
+                      </th>
+                      <th className='text-left p-3 hidden lg:table-cell'>
+                        <SortHeader
+                          label='Spread'
+                          sortKeyName='propsSpread'
+                          sortKey={sortKey}
+                          onToggleSort={toggleSort}
+                        />
+                      </th>
                     </>
                   )}
-                  <td className='p-3 pr-5'>
-                    <ChevronRight className='w-4 h-4 text-muted-foreground group-hover:text-foreground transition-colors' />
-                  </td>
+                  <th className='p-3 w-10' />
                 </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-        {sorted.length === 0 && (
-          <div className='p-12 text-center text-sm text-muted-foreground'>
-            No components match your current filters.
+              </thead>
+              <tbody>
+                {paginatedData.map(component => (
+                  <tr
+                    key={component.name}
+                    className='border-b border-border last:border-b-0 hover:bg-accent/50 transition-colors cursor-pointer group'
+                    onClick={() => setSelectedComponent(component)}
+                  >
+                    <td className='p-3 pl-5'>
+                      <div className='flex items-center gap-2'>
+                        {component.name.length > MAX_NAME_LENGTH ? (
+                          <Tooltip>
+                            <TooltipTrigger asChild>
+                              <span className='text-sm font-mono font-medium text-foreground cursor-default'>
+                                {'<'}
+                                {truncateName(component.name)}
+                                {' />'}
+                              </span>
+                            </TooltipTrigger>
+                            <TooltipContent side='top' sideOffset={4}>
+                              <span className='font-mono'>
+                                {'<'}
+                                {component.name}
+                                {' />'}
+                              </span>
+                            </TooltipContent>
+                          </Tooltip>
+                        ) : (
+                          <span className='text-sm font-mono font-medium text-foreground'>
+                            {'<'}
+                            {component.name}
+                            {' />'}
+                          </span>
+                        )}
+                        {component.propsSpreadCount > 0 && (
+                          <Badge
+                            variant='secondary'
+                            className='text-[9px] px-1 py-0'
+                          >
+                            spread
+                          </Badge>
+                        )}
+                      </div>
+                    </td>
+                    <td className='p-3'>{renderInstanceBar(component)}</td>
+                    <td className='p-3'>{renderPropBar(component)}</td>
+                    <td className='p-3 hidden lg:table-cell'>
+                      {renderPropNames(component)}
+                    </td>
+                    {report.format === 'raw-report' && (
+                      <>
+                        <td className='p-3 hidden md:table-cell'>
+                          <span className='text-sm tabular-nums text-muted-foreground'>
+                            {component.files.length > 0
+                              ? component.files.length
+                              : '--'}
+                          </span>
+                        </td>
+                        <td className='p-3 hidden lg:table-cell'>
+                          <span className='text-sm tabular-nums text-muted-foreground'>
+                            {component.propsSpreadCount > 0
+                              ? component.propsSpreadCount
+                              : '--'}
+                          </span>
+                        </td>
+                      </>
+                    )}
+                    <td className='p-3 pr-5'>
+                      <ChevronRight className='w-4 h-4 text-muted-foreground group-hover:text-foreground transition-colors' />
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
           </div>
-        )}
+          {sorted.length === 0 && (
+            <div className='p-12 text-center text-sm text-muted-foreground'>
+              No components match your current filters.
+            </div>
+          )}
+
+          {/* Pagination */}
+          {totalPages > 1 && (
+            <div className='flex items-center justify-between px-5 py-3 border-t border-border'>
+              <span className='text-xs text-muted-foreground'>
+                Page {currentPage} of {totalPages}
+              </span>
+              <div className='flex items-center gap-2'>
+                <button
+                  type='button'
+                  onClick={() => goToPage(currentPage - 1)}
+                  disabled={currentPage === 1}
+                  className='flex items-center justify-center w-8 h-8 rounded-md border border-border hover:bg-accent disabled:opacity-50 disabled:cursor-not-allowed transition-colors'
+                >
+                  <ChevronLeft className='w-4 h-4' />
+                </button>
+                <div className='flex items-center gap-1'>
+                  {currentPage > 2 && (
+                    <>
+                      <button
+                        type='button'
+                        onClick={() => goToPage(1)}
+                        className='flex items-center justify-center w-8 h-8 rounded-md hover:bg-accent text-xs transition-colors'
+                      >
+                        1
+                      </button>
+                      {currentPage > 3 && (
+                        <span className='text-muted-foreground text-xs px-1'>
+                          ...
+                        </span>
+                      )}
+                    </>
+                  )}
+                  {[currentPage - 1, currentPage, currentPage + 1]
+                    .filter(p => p >= 1 && p <= totalPages)
+                    .map(page => (
+                      <button
+                        key={page}
+                        type='button'
+                        onClick={() => goToPage(page)}
+                        className={`flex items-center justify-center w-8 h-8 rounded-md text-xs transition-colors ${
+                          page === currentPage
+                            ? 'bg-primary text-primary-foreground'
+                            : 'hover:bg-accent'
+                        }`}
+                      >
+                        {page}
+                      </button>
+                    ))}
+                  {currentPage < totalPages - 1 && (
+                    <>
+                      {currentPage < totalPages - 2 && (
+                        <span className='text-muted-foreground text-xs px-1'>
+                          ...
+                        </span>
+                      )}
+                      <button
+                        type='button'
+                        onClick={() => goToPage(totalPages)}
+                        className='flex items-center justify-center w-8 h-8 rounded-md hover:bg-accent text-xs transition-colors'
+                      >
+                        {totalPages}
+                      </button>
+                    </>
+                  )}
+                </div>
+                <button
+                  type='button'
+                  onClick={() => goToPage(currentPage + 1)}
+                  disabled={currentPage === totalPages}
+                  className='flex items-center justify-center w-8 h-8 rounded-md border border-border hover:bg-accent disabled:opacity-50 disabled:cursor-not-allowed transition-colors'
+                >
+                  <ChevronRight className='w-4 h-4' />
+                </button>
+              </div>
+            </div>
+          )}
+        </div>
       </div>
-    </div>
+    </TooltipProvider>
   );
 }

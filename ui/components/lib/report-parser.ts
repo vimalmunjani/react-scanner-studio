@@ -8,6 +8,47 @@ import type {
   ZombieProp,
 } from './report-types';
 
+/**
+ * Find the common base path from a list of absolute file paths
+ * and return a function to make paths relative to that base
+ */
+function createPathNormalizer(files: string[]): (path: string) => string {
+  if (files.length === 0) return path => path;
+
+  // Filter to only absolute paths (starting with /)
+  const absolutePaths = files.filter(f => f.startsWith('/'));
+  if (absolutePaths.length === 0) return path => path;
+
+  // Split all paths into segments
+  const splitPaths = absolutePaths.map(f => f.split('/'));
+
+  // Find common prefix
+  const firstPath = splitPaths[0];
+  let commonLength = 0;
+
+  for (let i = 0; i < firstPath.length; i++) {
+    const segment = firstPath[i];
+    const allMatch = splitPaths.every(p => p[i] === segment);
+    if (allMatch) {
+      commonLength = i + 1;
+    } else {
+      break;
+    }
+  }
+
+  // Build the common base path
+  const commonBase = firstPath.slice(0, commonLength).join('/');
+
+  // Return normalizer function
+  return (path: string) => {
+    if (path.startsWith(commonBase + '/')) {
+      const relativePath = path.slice(commonBase.length + 1);
+      return relativePath.startsWith('/') ? relativePath : './' + relativePath;
+    }
+    return path;
+  };
+}
+
 function detectFormat(data: unknown): ReportFormat | null {
   if (typeof data !== 'object' || data === null || Array.isArray(data)) {
     return null;
@@ -103,6 +144,27 @@ function normalizeCountComponentsAndProps(
 function normalizeRawReport(
   data: Record<string, unknown>
 ): NormalizedComponent[] {
+  // First pass: collect all file paths to find common base
+  const allFilePaths: string[] = [];
+  for (const value of Object.values(data)) {
+    if (typeof value !== 'object' || value === null) continue;
+    const entry = value as Record<string, unknown>;
+    const instancesArr = Array.isArray(entry.instances) ? entry.instances : [];
+    for (const instance of instancesArr) {
+      if (typeof instance !== 'object' || instance === null) continue;
+      const inst = instance as Record<string, unknown>;
+      const location = inst.location as
+        | { file: string; start: { line: number; column: number } }
+        | undefined;
+      if (location?.file) {
+        allFilePaths.push(location.file);
+      }
+    }
+  }
+
+  // Create path normalizer based on common base
+  const normalizePath = createPathNormalizer(allFilePaths);
+
   const results: NormalizedComponent[] = [];
 
   for (const [name, value] of Object.entries(data)) {
@@ -163,13 +225,13 @@ function normalizeRawReport(
           (propValues[propName][valueStr] ?? 0) + 1;
       }
 
-      // Track files
+      // Track files (normalize paths to be relative to project root)
       const location = inst.location as
         | { file: string; start: { line: number; column: number } }
         | undefined;
       if (location?.file && location?.start) {
         files.push({
-          file: location.file,
+          file: normalizePath(location.file),
           line: location.start.line,
           column: location.start.column,
         });
