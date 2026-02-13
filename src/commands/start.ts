@@ -3,7 +3,9 @@ import { confirm } from '@inquirer/prompts';
 import { checkPeerDependency } from '../utils/dependencies.js';
 import { getServerPort } from '../utils/port.js';
 import { startServer } from '../server/index.js';
+import { checkScanReport, formatRelativeTime } from '../utils/scannerConfig.js';
 import { logger, inquirerTheme } from '../utils/index.js';
+import { runScan, getConfigPath } from './scan.js';
 
 const DEFAULT_PORT = 3000;
 
@@ -60,6 +62,92 @@ async function openBrowser(url: string): Promise<void> {
   }
 }
 
+/**
+ * Check for existing scan report and prompt user accordingly
+ * Returns true if we should proceed, false if user cancelled
+ */
+async function handleScanReport(ciMode: boolean): Promise<boolean> {
+  // First check if config exists
+  const configPath = getConfigPath();
+  if (!configPath) {
+    logger.errorBox(
+      'Configuration Not Found',
+      `No ${logger.bold('react-scanner.config.js')} found.\nRun ${logger.bold('react-scanner-studio init')} first to create the configuration.`
+    );
+    return false;
+  }
+
+  const reportInfo = await checkScanReport();
+
+  if (reportInfo.exists && reportInfo.modifiedAt) {
+    // Report exists - ask user if they want to use it or generate a new one
+    const relativeTime = formatRelativeTime(reportInfo.modifiedAt);
+    const componentInfo =
+      reportInfo.componentCount !== null
+        ? ` with ${logger.bold(String(reportInfo.componentCount))} components`
+        : '';
+
+    logger.info(
+      `Found existing scan report${componentInfo} (${logger.bold(relativeTime)})`
+    );
+
+    if (ciMode) {
+      // In CI mode, use existing report without prompting
+      logger.info('Using existing report (CI mode)');
+      return true;
+    }
+
+    const useExisting = await confirm({
+      message: 'Use existing report? (No to generate a new one)',
+      default: true,
+      theme: inquirerTheme,
+    });
+
+    if (useExisting) {
+      return true;
+    }
+
+    // User wants a new report - run the scan
+    try {
+      await runScan({ showIntro: false, showSuccessBox: false });
+      return true;
+    } catch {
+      return false;
+    }
+  } else {
+    // No report exists - ask user if they want to generate one
+    logger.warning('No scan report found.');
+
+    if (ciMode) {
+      // In CI mode, fail if no report exists
+      logger.errorBox(
+        'Scan Report Not Found',
+        `No scan report found. Run ${logger.bold('react-scanner-studio scan')} first to generate the scan data.`
+      );
+      return false;
+    }
+
+    const shouldGenerate = await confirm({
+      message: 'Would you like to generate a scan report now?',
+      default: true,
+      theme: inquirerTheme,
+    });
+
+    if (!shouldGenerate) {
+      logger.info('Cannot start without a scan report. Exiting.');
+      return false;
+    }
+
+    // Run the scan
+    try {
+      await runScan({ showIntro: true, showSuccessBox: false });
+      return true;
+    } catch {
+      return false;
+    }
+  }
+}
+
 export function startCommand(program: Command): void {
   program
     .command('start')
@@ -78,6 +166,12 @@ export function startCommand(program: Command): void {
     .option('--open', 'Open the browser automatically', false)
     .action(async options => {
       checkPeerDependency();
+
+      // Check for scan report and handle accordingly
+      const shouldProceed = await handleScanReport(options.ci);
+      if (!shouldProceed) {
+        process.exit(1);
+      }
 
       const requestedPort = parseInt(options.port, 10);
 

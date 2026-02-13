@@ -6,6 +6,7 @@ import {
   initCommand,
   startCommand,
   buildCommand,
+  scanCommand,
 } from './commands/index.js';
 
 const program = new Command();
@@ -18,6 +19,7 @@ program
 // Register commands
 infoCommand(program);
 initCommand(program);
+scanCommand(program);
 startCommand(program);
 buildCommand(program);
 

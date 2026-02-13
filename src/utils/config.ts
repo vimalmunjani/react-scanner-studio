@@ -1,8 +1,15 @@
 import { writeFileSync, existsSync, readFileSync, appendFileSync } from 'fs';
 import { join } from 'path';
 import * as logger from './logger.js';
+import { findConfigPath } from './scannerConfig.js';
 
 const IGNORE_ENTRY = '.react-scanner-studio/';
+
+const PACKAGE_JSON_SCRIPTS = {
+  scan: 'react-scanner-studio scan',
+  'scan:start': 'react-scanner-studio start',
+  'scan:build': 'react-scanner-studio build',
+} as const;
 const IGNORE_COMMENT = '# React Scanner Studio';
 
 interface IgnoreFileConfig {
@@ -89,25 +96,85 @@ export function updateIgnoreFiles(): void {
   }
 }
 
+/**
+ * Update package.json to add react-scanner-studio scripts
+ */
+export function updatePackageJsonScripts(): void {
+  const cwd = process.cwd();
+  const packageJsonPath = join(cwd, 'package.json');
+
+  if (!existsSync(packageJsonPath)) {
+    logger.warning('No package.json found. Skipping script addition.');
+    return;
+  }
+
+  try {
+    const content = readFileSync(packageJsonPath, 'utf-8');
+    const packageJson = JSON.parse(content);
+
+    if (!packageJson.scripts) {
+      packageJson.scripts = {};
+    }
+
+    const addedScripts: string[] = [];
+    const skippedScripts: string[] = [];
+
+    for (const [scriptName, scriptCommand] of Object.entries(
+      PACKAGE_JSON_SCRIPTS
+    )) {
+      if (packageJson.scripts[scriptName]) {
+        skippedScripts.push(scriptName);
+      } else {
+        packageJson.scripts[scriptName] = scriptCommand;
+        addedScripts.push(scriptName);
+      }
+    }
+
+    if (addedScripts.length > 0) {
+      writeFileSync(
+        packageJsonPath,
+        JSON.stringify(packageJson, null, 2) + '\n'
+      );
+      logger.success(
+        `Added scripts to package.json: ${addedScripts.map(s => logger.bold(s)).join(', ')}`
+      );
+    }
+
+    if (skippedScripts.length > 0) {
+      logger.dim(`Scripts already exist: ${skippedScripts.join(', ')}`);
+    }
+  } catch (error) {
+    logger.warning(`Failed to update package.json: ${error}`);
+  }
+}
+
 export interface ScannerConfigOptions {
   crawlFrom: string;
   importedFrom: string;
 }
 
-export function createReactScannerConfig(options: ScannerConfigOptions): void {
-  const configPath = join(process.cwd(), 'react-scanner.config.js');
+export function createReactScannerConfig(
+  options: ScannerConfigOptions
+): boolean {
+  // Check if config already exists in current or parent directories
+  const existingConfigPath = findConfigPath();
 
-  if (existsSync(configPath)) {
-    logger.info('react-scanner.config.js already exists.');
-    return;
+  if (existingConfigPath) {
+    logger.info(
+      `react-scanner.config.js already exists at ${existingConfigPath}`
+    );
+    return false;
   }
+
+  // Create config in current directory
+  const configPath = join(process.cwd(), 'react-scanner.config.js');
 
   const configContent = `module.exports = {
   crawlFrom: '${options.crawlFrom}',
   includeSubComponents: true,
   importedFrom: '${options.importedFrom}',
   processors: [
-    ['count-components-and-props', { outputTo: './.react-scanner-studio/scan-report.json' }],
+    ['raw-report', { outputTo: './.react-scanner-studio/scan-report.json' }],
   ],
 };
 `;
@@ -115,10 +182,12 @@ export function createReactScannerConfig(options: ScannerConfigOptions): void {
   try {
     writeFileSync(configPath, configContent);
     logger.success('Created react-scanner.config.js');
+    return true;
   } catch (error) {
     logger.errorBox(
       'Configuration Error',
       `Failed to create react-scanner.config.js\n${error}`
     );
+    return false;
   }
 }

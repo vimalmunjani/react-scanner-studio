@@ -30,7 +30,7 @@
     "registry": "https://registry.npmjs.org/"
   },
   "scripts": {
-    "build": "tsc",
+    "build": "tsc && chmod +x dist/index.js",
     "build:ui": "vite build --config ui/vite.config.ts",
     "build:docs": "vitepress build docs",
     "start": "node dist/index.js",

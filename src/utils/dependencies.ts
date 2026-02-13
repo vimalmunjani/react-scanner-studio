@@ -76,7 +76,18 @@ export async function installReactScanner(): Promise<void> {
 
   return new Promise((resolve, reject) => {
     const child = spawn(command, args, {
-      stdio: 'pipe',
+      stdio: ['inherit', 'pipe', 'pipe'],
+    });
+
+    let stderr = '';
+    let stdout = '';
+
+    child.stdout?.on('data', data => {
+      stdout += data.toString();
+    });
+
+    child.stderr?.on('data', data => {
+      stderr += data.toString();
     });
 
     // Handle SIGINT (Ctrl+C)
@@ -99,9 +110,10 @@ export async function installReactScanner(): Promise<void> {
         resolve();
       } else {
         logger.spinnerError('Failed to install react-scanner');
+        const errorDetails = stderr || stdout || `Exit code: ${code}`;
         logger.errorBox(
           'Installation Failed',
-          'Could not install react-scanner automatically.\nPlease install it manually and try again.'
+          `Could not install react-scanner automatically.\n\n${errorDetails}\n\nPlease install it manually and try again.`
         );
         reject(new Error(`Installation failed with code ${code}`));
       }

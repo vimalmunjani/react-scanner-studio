@@ -2,10 +2,21 @@ import { useState, useEffect } from 'react';
 import { ComponentTable } from './ComponentTable';
 import './App.css';
 
+export interface ComponentInstance {
+  props: Record<string, string | number | boolean | null>;
+  propsSpread: boolean;
+  location: {
+    file: string;
+    start: {
+      line: number;
+      column: number;
+    };
+  };
+}
+
 export interface ScanData {
   [componentName: string]: {
-    instances: number;
-    props?: Record<string, number>;
+    instances: ComponentInstance[];
   };
 }
 

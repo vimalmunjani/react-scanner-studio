@@ -46,11 +46,28 @@ export function ComponentTable({ data }: ComponentTableProps) {
   };
 
   // Transform data into array and sort
-  const components = Object.entries(data).map(([name, info]) => ({
-    name,
-    count: info.instances,
-    props: info.props || {},
-  }));
+  // With raw-report format, instances is an array, so we count its length
+  // and aggregate prop usage across all instances
+  const components = Object.entries(data).map(([name, info]) => {
+    const instances = info.instances || [];
+    const count = instances.length;
+
+    // Aggregate prop usage counts across all instances
+    const propCounts: Record<string, number> = {};
+    for (const instance of instances) {
+      if (instance.props) {
+        for (const propName of Object.keys(instance.props)) {
+          propCounts[propName] = (propCounts[propName] || 0) + 1;
+        }
+      }
+    }
+
+    return {
+      name,
+      count,
+      props: propCounts,
+    };
+  });
 
   components.sort((a, b) => {
     const aValue = sortConfig.key === 'name' ? a.name.toLowerCase() : a.count;

@@ -2,29 +2,67 @@ import { defineConfig } from 'vitepress';
 
 export default defineConfig({
   title: 'React Scanner Studio',
-  description: 'A React component scanner and visualization tool',
+  description:
+    'A dashboard generator that transforms react-scanner output into a portable, interactive component usage insights dashboard',
   base: '/',
 
   themeConfig: {
     logo: '/logo.png',
     nav: [
       { text: 'Home', link: '/' },
+      { text: 'Quick Start', link: '/quick-start/' },
       { text: 'Guide', link: '/guide/' },
-      { text: 'API', link: '/api/' },
+      { text: 'CLI Reference', link: '/cli/' },
+      { text: 'Configuration', link: '/configuration/' },
     ],
 
     sidebar: [
       {
-        text: 'Guide',
+        text: 'Introduction',
         items: [
-          { text: 'Getting Started', link: '/guide/' },
+          { text: 'What is React Scanner Studio?', link: '/guide/' },
           { text: 'Installation', link: '/guide/installation' },
-          { text: 'Usage', link: '/guide/usage' },
         ],
       },
       {
-        text: 'API Reference',
-        items: [{ text: 'API Overview', link: '/api/' }],
+        text: 'Quick Start',
+        items: [
+          { text: 'Overview', link: '/quick-start/' },
+          { text: 'Automated Setup', link: '/quick-start/automated' },
+          { text: 'Manual Setup', link: '/quick-start/manual' },
+          { text: 'LLM-Assisted Setup', link: '/quick-start/llm-assisted' },
+        ],
+      },
+      {
+        text: 'CLI Commands',
+        items: [
+          { text: 'Overview', link: '/cli/' },
+          { text: 'init', link: '/cli/init' },
+          { text: 'scan', link: '/cli/scan' },
+          { text: 'start', link: '/cli/start' },
+          { text: 'build', link: '/cli/build' },
+        ],
+      },
+      {
+        text: 'Configuration',
+        items: [
+          { text: 'react-scanner.config.js', link: '/configuration/' },
+          { text: 'Configuration Options', link: '/configuration/options' },
+        ],
+      },
+      {
+        text: 'CI/CD Integration',
+        items: [
+          { text: 'Overview', link: '/advanced/ci-cd/' },
+          { text: 'GitHub Actions', link: '/advanced/ci-cd/github-actions' },
+          { text: 'GitLab CI', link: '/advanced/ci-cd/gitlab-ci' },
+          { text: 'CircleCI', link: '/advanced/ci-cd/circleci' },
+          { text: 'Azure Pipelines', link: '/advanced/ci-cd/azure-pipelines' },
+        ],
+      },
+      {
+        text: 'Advanced',
+        items: [{ text: 'Troubleshooting', link: '/advanced/troubleshooting' }],
       },
     ],
 
@@ -43,6 +81,10 @@ export default defineConfig({
       message: 'Released under the MIT License.',
       copyright:
         'Created with ❤️ by <a href="https://www.linkedin.com/in/vimalmunjani/" target="_blank">Vimal Munjani</a>',
+    },
+
+    search: {
+      provider: 'local',
     },
   },
 

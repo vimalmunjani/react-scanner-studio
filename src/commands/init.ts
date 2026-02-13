@@ -6,6 +6,7 @@ import {
   installReactScanner,
   createReactScannerConfig,
   updateIgnoreFiles,
+  updatePackageJsonScripts,
   logger,
   inquirerTheme,
 } from '../utils/index.js';
@@ -59,8 +60,14 @@ export function initCommand(program: Command): void {
         theme: inquirerTheme,
       });
 
-      createReactScannerConfig({ crawlFrom, importedFrom });
-      updateIgnoreFiles();
+      const configCreated = createReactScannerConfig({
+        crawlFrom,
+        importedFrom,
+      });
+      if (configCreated) {
+        updateIgnoreFiles();
+        updatePackageJsonScripts();
+      }
 
       logger.successBox(
         'Initialization Complete',

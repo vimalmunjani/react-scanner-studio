@@ -4,7 +4,11 @@ export {
   promptInstallReactScanner,
   installReactScanner,
 } from './dependencies.js';
-export { createReactScannerConfig, updateIgnoreFiles } from './config.js';
+export {
+  createReactScannerConfig,
+  updateIgnoreFiles,
+  updatePackageJsonScripts,
+} from './config.js';
 export type { ScannerConfigOptions } from './config.js';
 export { getServerPort, isPortAvailable } from './port.js';
 export type { PortOptions } from './port.js';

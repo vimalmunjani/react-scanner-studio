@@ -2,13 +2,18 @@ import { Command } from 'commander';
 import { resolve, dirname, basename } from 'path';
 import { fileURLToPath } from 'url';
 import { writeFileSync, mkdirSync, existsSync } from 'fs';
+import { confirm } from '@inquirer/prompts';
 import { checkPeerDependency } from '../utils/dependencies.js';
 import {
   getScanData,
   readScannerConfig,
   getOutputFile,
+  checkScanReport,
+  formatRelativeTime,
+  getConfigDir,
 } from '../utils/scannerConfig.js';
-import { logger } from '../utils/index.js';
+import { logger, inquirerTheme } from '../utils/index.js';
+import { runScan, getConfigPath } from './scan.js';
 
 // ESM equivalent of __dirname
 const __filename = fileURLToPath(import.meta.url);
@@ -28,11 +33,98 @@ function getUiRoot(): string {
 }
 
 /**
+ * Check for existing scan report and prompt user accordingly
+ * Returns true if we should proceed, false if user cancelled
+ */
+async function handleScanReport(ciMode: boolean): Promise<boolean> {
+  // First check if config exists
+  const configPath = getConfigPath();
+  if (!configPath) {
+    logger.errorBox(
+      'Configuration Not Found',
+      `No ${logger.bold('react-scanner.config.js')} found.\nRun ${logger.bold('react-scanner-studio init')} first to create the configuration.`
+    );
+    return false;
+  }
+
+  const reportInfo = await checkScanReport();
+
+  if (reportInfo.exists && reportInfo.modifiedAt) {
+    // Report exists - ask user if they want to use it or generate a new one
+    const relativeTime = formatRelativeTime(reportInfo.modifiedAt);
+    const componentInfo =
+      reportInfo.componentCount !== null
+        ? ` with ${logger.bold(String(reportInfo.componentCount))} components`
+        : '';
+
+    logger.info(
+      `Found existing scan report${componentInfo} (${logger.bold(relativeTime)})`
+    );
+
+    if (ciMode) {
+      // In CI mode, use existing report without prompting
+      logger.info('Using existing report (CI mode)');
+      return true;
+    }
+
+    const useExisting = await confirm({
+      message: 'Use existing report? (No to generate a new one)',
+      default: true,
+      theme: inquirerTheme,
+    });
+
+    if (useExisting) {
+      return true;
+    }
+
+    // User wants a new report - run the scan
+    try {
+      await runScan({ showIntro: false, showSuccessBox: false });
+      return true;
+    } catch {
+      return false;
+    }
+  } else {
+    // No report exists - ask user if they want to generate one
+    logger.warning('No scan report found.');
+
+    if (ciMode) {
+      // In CI mode, fail if no report exists
+      logger.errorBox(
+        'Scan Report Not Found',
+        `No scan report found. Run ${logger.bold('react-scanner-studio scan')} first to generate the scan data.`
+      );
+      return false;
+    }
+
+    const shouldGenerate = await confirm({
+      message: 'Would you like to generate a scan report now?',
+      default: true,
+      theme: inquirerTheme,
+    });
+
+    if (!shouldGenerate) {
+      logger.info('Cannot build without a scan report. Exiting.');
+      return false;
+    }
+
+    // Run the scan
+    try {
+      await runScan({ showIntro: true, showSuccessBox: false });
+      return true;
+    } catch {
+      return false;
+    }
+  }
+}
+
+/**
  * Build the React Scanner Studio and output to consumer's .react-scanner-studio/ folder
  */
 async function runBuild(): Promise<void> {
-  const consumerRoot = process.cwd();
-  const outputDir = resolve(consumerRoot, '.react-scanner-studio');
+  const configDir = getConfigDir();
+  const projectRoot = configDir || process.cwd();
+  const outputDir = resolve(projectRoot, '.react-scanner-studio');
 
   logger.infoBox(
     'React Scanner Studio',
@@ -144,8 +236,16 @@ export function buildCommand(program: Command): void {
     .description(
       'Build the React Scanner Studio as static files to .react-scanner-studio/'
     )
-    .action(async () => {
+    .option('--ci', 'Run in CI mode (no interactive prompts)', false)
+    .action(async options => {
       checkPeerDependency();
+
+      // Check for scan report and handle accordingly
+      const shouldProceed = await handleScanReport(options.ci);
+      if (!shouldProceed) {
+        process.exit(1);
+      }
+
       await runBuild();
     });
 }
