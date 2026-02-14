@@ -104,7 +104,7 @@ export function AppSidebar() {
                         item.comingSoon ? 'cursor-not-allowed opacity-60' : ''
                       }
                     >
-                      <Icon className='w-4 h-4' />
+                      <Icon className='w-4 h-4 ml-2' />
                       <span>{item.label}</span>
                       {item.comingSoon && !collapsed && (
                         <Badge
