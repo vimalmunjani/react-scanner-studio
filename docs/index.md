@@ -1,6 +1,6 @@
 ---
 layout: home
-title: React Scanner Studio - Interactive Component Usage Dashboard & Analysis
+title: React Scanner Studio
 description: A portable, interactive dashboard for analyzing React component usage across your codebase. Get component usage insights, prop analysis, and design system metrics in seconds.
 
 hero:
