@@ -1,3 +1,7 @@
+---
+description: Get up and running with React Scanner Studio in minutes. Choose automated, manual, or LLM-assisted setup.
+---
+
 # Quick Start
 
 Get up and running with React Scanner Studio in just a few minutes. Choose the setup method that works best for you.

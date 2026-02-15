@@ -1,3 +1,7 @@
+---
+description: React Scanner Studio turns react-scanner JSON output into an interactive dashboard for component usage, prop analysis, and design system tracking.
+---
+
 # What is React Scanner Studio?
 
 React Scanner Studio is a portable, interactive dashboard for analyzing React component usage across your codebase. It leverages [react-scanner](https://github.com/moroshko/react-scanner) under the hood to scan your component data.

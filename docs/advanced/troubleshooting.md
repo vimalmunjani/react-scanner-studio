@@ -1,3 +1,7 @@
+---
+description: Fix common React Scanner Studio issues — config not found, scan errors, build failures, and CI/CD problems.
+---
+
 # Troubleshooting
 
 This guide covers common issues you may encounter when using React Scanner Studio and how to resolve them.

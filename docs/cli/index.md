@@ -1,3 +1,7 @@
+---
+description: Reference for React Scanner Studio CLI commands — init, scan, start, and build for component usage dashboards.
+---
+
 # CLI Commands Overview
 
 React Scanner Studio provides a command-line interface (CLI) for scanning, visualizing, and building component usage dashboards.

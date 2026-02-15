@@ -1,3 +1,7 @@
+---
+description: Install React Scanner Studio via npx, npm, or yarn. Run without global install or add to your project for CI and scripts.
+---
+
 # Installation
 
 There are several ways to install and use React Scanner Studio depending on your needs.

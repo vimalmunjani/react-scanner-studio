@@ -1,3 +1,7 @@
+---
+description: Configure React Scanner Studio with react-scanner.config.js — crawl paths, processors, and scan output options.
+---
+
 # Configuration
 
 React Scanner Studio uses the `react-scanner.config.js` configuration file to determine how to scan your codebase and where to output the results.

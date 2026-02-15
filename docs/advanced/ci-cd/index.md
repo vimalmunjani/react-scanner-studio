@@ -1,3 +1,7 @@
+---
+description: Automate React Scanner Studio in CI/CD with GitHub Actions, GitLab CI, CircleCI, and Azure Pipelines. Generate dashboards on every build.
+---
+
 # CI/CD Integration
 
 React Scanner Studio is designed to work seamlessly in continuous integration and deployment pipelines. This guide covers how to automate component scanning and dashboard generation.
