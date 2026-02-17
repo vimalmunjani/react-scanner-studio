@@ -1,8 +1,3 @@
-import {
-  createServer as createHttpServer,
-  IncomingMessage,
-  ServerResponse,
-} from 'http';
 import { resolve, dirname } from 'path';
 import { fileURLToPath } from 'url';
 import { getScanData } from '../utils/scannerConfig.js';
@@ -26,66 +21,151 @@ function getUiRoot(): string {
 }
 
 /**
- * Start the HTTP server using Polka with Vite middleware mode
- * (similar approach to Storybook's builder-vite)
+ * Start the HTTP server using RSpack dev server
  */
 export async function startServer(port: number): Promise<void> {
   logger.startSpinner('Starting development server...');
 
-  // Dynamically import Vite to create dev server in middleware mode
-  const { createServer: createViteServer } = await import('vite');
+  const { rspack } = await import('@rspack/core');
+  const { RspackDevServer } = await import('@rspack/dev-server');
 
   const uiRoot = getUiRoot();
 
-  // Create HTTP server first
-  const server = createHttpServer();
-
-  // Create Vite dev server with HMR configured to use our HTTP server
-  // This ensures the WebSocket server uses the same port as the HTTP server
-  const vite = await createViteServer({
-    root: uiRoot,
-    configFile: resolve(uiRoot, 'vite.config.ts'),
-    server: {
-      middlewareMode: true,
-      hmr: {
-        // Attach HMR WebSocket to our HTTP server instead of creating a new one
-        server,
-        port,
+  const compiler = rspack({
+    context: uiRoot,
+    entry: {
+      main: './main.tsx',
+    },
+    output: {
+      path: resolve(uiRoot, '../dist/ui'),
+      filename: '[name].js',
+      cssFilename: '[name].css',
+      publicPath: '/',
+    },
+    stats: 'none',
+    infrastructureLogging: {
+      level: 'none',
+    },
+    resolve: {
+      extensions: ['.ts', '.tsx', '.js', '.jsx', '.json'],
+      alias: {
+        '@/components': resolve(uiRoot, 'components'),
+        '@/lib': resolve(uiRoot, 'components/lib'),
+        '@/hooks': resolve(uiRoot, 'components/hooks'),
       },
     },
-    appType: 'spa',
+    experiments: {
+      css: true,
+    },
+    module: {
+      rules: [
+        {
+          test: /\.tsx?$/,
+          use: {
+            loader: 'builtin:swc-loader',
+            options: {
+              jsc: {
+                parser: {
+                  syntax: 'typescript',
+                  tsx: true,
+                },
+                transform: {
+                  react: {
+                    runtime: 'automatic',
+                    development: true,
+                    refresh: true,
+                  },
+                },
+              },
+            },
+          },
+          include: [uiRoot],
+        },
+        {
+          test: /\.css$/,
+          use: [
+            {
+              loader: 'postcss-loader',
+              options: {
+                postcssOptions: {
+                  plugins: ['@tailwindcss/postcss'],
+                },
+              },
+            },
+          ],
+          type: 'css/auto',
+        },
+        {
+          test: /\.(png|jpe?g|gif|svg|ico|webp)$/i,
+          type: 'asset/resource',
+        },
+        {
+          test: /\.(woff|woff2|eot|ttf|otf)$/i,
+          type: 'asset/resource',
+        },
+      ],
+    },
+    plugins: [
+      new rspack.HtmlRspackPlugin({
+        template: './index.html',
+        filename: 'index.html',
+        inject: true,
+      }),
+      new rspack.DefinePlugin({
+        'process.env.NODE_ENV': JSON.stringify('development'),
+      }),
+      // React Refresh plugin for HMR
+      await import('@rspack/plugin-react-refresh').then(m => new m.default()),
+    ],
+    devtool: 'cheap-module-source-map',
+    mode: 'development',
   });
 
-  // Set up request handler
-  server.on('request', async (req: IncomingMessage, res: ServerResponse) => {
-    const url = req.url || '';
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const devServerOptions: any = {
+    port,
+    hot: true,
+    open: false,
+    historyApiFallback: true,
+    client: {
+      logging: 'none',
+      overlay: false,
+    },
+    static: {
+      directory: resolve(uiRoot, 'public'),
+      publicPath: '/',
+      serveIndex: true,
+      watch: true,
+    },
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    setupMiddlewares: (middlewares: any[]) => {
+      // Add API routes before other middlewares
+      middlewares.unshift({
+        name: 'api-scan-data',
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        middleware: (req: any, res: any, next: any) => {
+          const url = req.url || '';
+          if (url === '/api/scan-data' || url.startsWith('/api/scan-data?')) {
+            res.setHeader('Content-Type', 'application/json');
+            res.setHeader('Cache-Control', 'no-cache');
+            getScanData().then(result => {
+              res.end(JSON.stringify(result));
+            });
+            return;
+          }
+          next();
+        },
+      });
+      return middlewares;
+    },
+  };
 
-    // Handle API routes FIRST - before Vite middleware
-    if (url === '/api/scan-data' || url.startsWith('/api/scan-data?')) {
-      res.setHeader('Content-Type', 'application/json');
-      res.setHeader('Cache-Control', 'no-cache');
-      const result = await getScanData();
-      res.end(JSON.stringify(result));
-      return;
-    }
-
-    // Pass everything else to Vite
-    vite.middlewares(req, res);
-  });
-
-  // Handle server errors
-  server.on('error', (err: NodeJS.ErrnoException) => {
-    logger.spinnerError('Server error');
-    logger.errorBox('Server Error', err.message);
-    vite.close();
-    process.exit(1);
-  });
+  const devServer = new RspackDevServer(devServerOptions, compiler);
 
   // Handle graceful shutdown
   const shutdown = async () => {
     logger.info('Shutting down server...');
-    await vite.close();
-    server.close();
+    await devServer.stop();
     logger.success('Server stopped gracefully');
     process.exit(0);
   };
@@ -93,16 +173,21 @@ export async function startServer(port: number): Promise<void> {
   process.on('SIGINT', shutdown);
   process.on('SIGTERM', shutdown);
 
-  return new Promise((resolvePromise, reject) => {
-    server.on('error', reject);
-
-    server.listen(port, '127.0.0.1', () => {
-      logger.spinnerSuccess('Server started');
-      logger.serverInfo(port, [
-        'Hot Module Replacement enabled',
-        'Press Ctrl+C to stop the server',
-      ]);
-      resolvePromise();
-    });
+  return new Promise<void>((resolvePromise, reject) => {
+    devServer
+      .start()
+      .then(() => {
+        logger.spinnerSuccess('Server started');
+        logger.serverInfo(port, [
+          'Hot Module Replacement enabled',
+          'Press Ctrl+C to stop the server',
+        ]);
+        resolvePromise();
+      })
+      .catch((err: Error) => {
+        logger.spinnerError('Server error');
+        logger.errorBox('Server Error', err.message);
+        reject(err);
+      });
   });
 }

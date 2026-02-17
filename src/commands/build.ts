@@ -1,7 +1,7 @@
 import { Command } from 'commander';
 import { resolve, dirname, basename } from 'path';
 import { fileURLToPath } from 'url';
-import { writeFileSync, mkdirSync, existsSync } from 'fs';
+import { writeFileSync, mkdirSync, existsSync, readFileSync, cpSync } from 'fs';
 import { confirm } from '@inquirer/prompts';
 import { checkPeerDependency } from '../utils/dependencies.js';
 import {
@@ -149,12 +149,10 @@ async function runBuild(): Promise<void> {
 
   logger.spinnerSuccess('Scan data loaded');
 
-  // Step 2: Build the UI with Vite
-  logger.startSpinner('Building UI with Vite...');
+  // Step 2: Build the UI with RSpack
+  logger.startSpinner('Building UI with RSpack...');
 
-  const { build } = await import('vite');
-  const react = (await import('@vitejs/plugin-react')).default;
-  const tailwindcss = (await import('@tailwindcss/vite')).default;
+  const { rspack } = await import('@rspack/core');
 
   const uiRoot = getUiRoot();
 
@@ -169,25 +167,142 @@ async function runBuild(): Promise<void> {
   const scanFileName = scanFile ? basename(scanFile) : 'scan-data.json';
 
   try {
-    await build({
-      root: uiRoot,
-      plugins: [react(), tailwindcss()],
-      base: './', // Use relative paths for assets
-      build: {
-        outDir: outputDir,
-        emptyOutDir: true,
+    const compiler = rspack({
+      context: uiRoot,
+      entry: {
+        main: './main.tsx',
+      },
+      output: {
+        path: outputDir,
+        filename: 'assets/[name].[contenthash].js',
+        cssFilename: 'assets/[name].[contenthash].css',
+        publicPath: './',
+        clean: true,
+      },
+      stats: 'none',
+      infrastructureLogging: {
+        level: 'none',
       },
       resolve: {
+        extensions: ['.ts', '.tsx', '.js', '.jsx', '.json'],
         alias: {
           '@/components': resolve(uiRoot, 'components'),
           '@/lib': resolve(uiRoot, 'components/lib'),
           '@/hooks': resolve(uiRoot, 'components/hooks'),
         },
       },
-      logLevel: 'warn', // Reduce noise during build
+      experiments: {
+        css: true,
+      },
+      module: {
+        rules: [
+          {
+            test: /\.tsx?$/,
+            use: {
+              loader: 'builtin:swc-loader',
+              options: {
+                jsc: {
+                  parser: {
+                    syntax: 'typescript',
+                    tsx: true,
+                  },
+                  transform: {
+                    react: {
+                      runtime: 'automatic',
+                      development: false,
+                      refresh: false,
+                    },
+                  },
+                },
+              },
+            },
+            include: [uiRoot],
+          },
+          {
+            test: /\.css$/,
+            use: [
+              {
+                loader: 'postcss-loader',
+                options: {
+                  postcssOptions: {
+                    plugins: ['@tailwindcss/postcss'],
+                  },
+                },
+              },
+            ],
+            type: 'css/auto',
+          },
+          {
+            test: /\.(png|jpe?g|gif|svg|ico|webp)$/i,
+            type: 'asset/resource',
+            generator: {
+              filename: 'assets/[name].[hash][ext]',
+            },
+          },
+          {
+            test: /\.(woff|woff2|eot|ttf|otf)$/i,
+            type: 'asset/resource',
+            generator: {
+              filename: 'assets/[name].[hash][ext]',
+            },
+          },
+        ],
+      },
+      plugins: [
+        new rspack.HtmlRspackPlugin({
+          template: './index.html',
+          filename: 'index.html',
+          inject: true,
+        }),
+        new rspack.DefinePlugin({
+          'process.env.NODE_ENV': JSON.stringify('production'),
+        }),
+      ],
+      optimization: {
+        minimize: true,
+        splitChunks: {
+          chunks: 'all',
+          cacheGroups: {
+            vendor: {
+              test: /[\\/]node_modules[\\/]/,
+              name: 'vendors',
+              chunks: 'all',
+            },
+          },
+        },
+      },
+      devtool: 'source-map',
+      mode: 'production',
     });
+
+    await new Promise<void>((resolvePromise, reject) => {
+      compiler.run((err, stats) => {
+        if (err) {
+          reject(err);
+          return;
+        }
+        if (stats?.hasErrors()) {
+          const info = stats.toJson();
+          reject(new Error(info.errors?.map(e => e.message).join('\n')));
+          return;
+        }
+        compiler.close(closeErr => {
+          if (closeErr) {
+            reject(closeErr);
+            return;
+          }
+          resolvePromise();
+        });
+      });
+    });
+
+    // Copy public folder assets to output directory
+    const publicDir = resolve(uiRoot, 'public');
+    if (existsSync(publicDir)) {
+      cpSync(publicDir, outputDir, { recursive: true });
+    }
   } catch (error) {
-    logger.spinnerError('Vite build failed');
+    logger.spinnerError('RSpack build failed');
     logger.errorBox('Build Error', String(error));
     process.exit(1);
   }
@@ -205,7 +320,6 @@ async function runBuild(): Promise<void> {
   // Step 4: Create a custom index.html that loads scan data from the JSON file
   // We need to modify the built index.html to handle static data loading
   const indexPath = resolve(outputDir, 'index.html');
-  const { readFileSync } = await import('fs');
   let indexHtml = readFileSync(indexPath, 'utf-8');
 
   // Inject a script that intercepts fetch calls to /api/scan-data

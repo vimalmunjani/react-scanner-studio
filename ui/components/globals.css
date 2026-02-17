@@ -1,5 +1,9 @@
 @import 'tailwindcss';
 
+/* Explicitly tell Tailwind where to find classes */
+@source "../";
+@source "./";
+
 @custom-variant dark (&&:where(.dark, .dark *));
 
 /* ===== LIGHT MODE (default) ===== */
