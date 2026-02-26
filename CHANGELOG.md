@@ -5,6 +5,14 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.1.1] - 2026-02-17
+
+### Changed
+- Migrated UI build and development workflow from Vite to **Rspack** for compatibility and improved performance.
+
+### Fixed
+- Streamlined documentation by simplifying titles and removing redundant comparison tables.
+
 ## [1.0.0] - 2026-02-14
 
 ### Added
@@ -43,4 +51,5 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - CI/CD integration guides for GitHub Actions, GitLab CI, CircleCI, and Azure Pipelines
   - Troubleshooting guide
 
+[1.1.1]: https://github.com/vimalmunjani/react-scanner-studio/releases/tag/v1.1.1
 [1.0.0]: https://github.com/vimalmunjani/react-scanner-studio/releases/tag/v1.0.0
