@@ -1,8 +1,13 @@
 import { Command } from 'commander';
 import { spawn } from 'child_process';
+import { writeFileSync, unlinkSync, existsSync, mkdirSync } from 'fs';
+import { join, extname } from 'path';
+import { createRequire } from 'module';
 import { checkPeerDependency } from '../utils/dependencies.js';
 import { logger } from '../utils/index.js';
 import { findConfigPath } from '../utils/scannerConfig.js';
+
+const require = createRequire(import.meta.url);
 
 // Re-export for backwards compatibility
 export { findConfigPath as getConfigPath } from '../utils/scannerConfig.js';
@@ -26,7 +31,7 @@ export async function runScan(options: RunScanOptions = {}): Promise<void> {
   if (!configPath) {
     logger.errorBox(
       'Configuration Not Found',
-      `No ${logger.bold('react-scanner.config.js')} found.\nRun ${logger.bold('react-scanner-studio init')} first to create the configuration.`
+      `No ${logger.bold('react-scanner.config.*')} found.\nRun ${logger.bold('react-scanner-studio init')} first to create the configuration.`
     );
     throw new Error('Configuration not found');
   }
@@ -40,8 +45,71 @@ export async function runScan(options: RunScanOptions = {}): Promise<void> {
 
   logger.startSpinner('Running react-scanner...');
 
+  // Handle non-js config files by transforming them with jiti
+  let finalConfigPath = configPath;
+  const isNonJs =
+    extname(configPath) !== '.js' && extname(configPath) !== '.cjs';
+  let tempConfigPath: string | null = null;
+
+  if (isNonJs) {
+    try {
+      const { createJiti } = require('jiti');
+      const jiti = createJiti(import.meta.url);
+      const configContent = await jiti.import(configPath);
+      const config = configContent.default || configContent;
+
+      const tempDir = join(process.cwd(), '.react-scanner-studio', 'temp');
+      if (!existsSync(tempDir)) {
+        mkdirSync(tempDir, { recursive: true });
+      }
+
+      tempConfigPath = join(
+        tempDir,
+        `react-scanner.config.tmp-${Date.now()}.cjs`
+      );
+
+      // Simple serialization for config object
+      // For complex configs with deep functions/regex, we might need a more sophisticated approach
+      // but this handles most react-scanner config needs.
+      const serialize = (obj: unknown): string => {
+        if (obj instanceof RegExp) return obj.toString();
+        if (typeof obj === 'function') return obj.toString();
+        if (Array.isArray(obj))
+          return `[${obj.map(item => serialize(item)).join(', ')}]`;
+        if (typeof obj === 'object' && obj !== null) {
+          return `{ ${Object.entries(obj)
+            .map(([k, v]) => `"${k}": ${serialize(v)}`)
+            .join(', ')} }`;
+        }
+        return JSON.stringify(obj);
+      };
+
+      const serializedConfig = `module.exports = ${serialize(config)};`;
+
+      writeFileSync(tempConfigPath, serializedConfig);
+      finalConfigPath = tempConfigPath;
+    } catch (error) {
+      logger.spinnerError('Failed to process configuration file');
+      logger.errorBox(
+        'Config Error',
+        `Could not transform ${extname(configPath)} config: ${error}`
+      );
+      throw error;
+    }
+  }
+
+  const cleanup = () => {
+    if (tempConfigPath && existsSync(tempConfigPath)) {
+      try {
+        unlinkSync(tempConfigPath);
+      } catch {
+        // Ignore cleanup errors
+      }
+    }
+  };
+
   return new Promise((resolve, reject) => {
-    const child = spawn('npx', ['react-scanner', '--config', configPath], {
+    const child = spawn('npx', ['react-scanner', '--config', finalConfigPath], {
       stdio: 'pipe',
     });
 
@@ -59,6 +127,7 @@ export async function runScan(options: RunScanOptions = {}): Promise<void> {
     // Handle SIGINT (Ctrl+C)
     const handleSignal = () => {
       child.kill('SIGTERM');
+      cleanup();
       logger.spinnerError('Scan cancelled');
       process.exit(1);
     };
@@ -70,6 +139,7 @@ export async function runScan(options: RunScanOptions = {}): Promise<void> {
       // Remove signal handlers
       process.off('SIGINT', handleSignal);
       process.off('SIGTERM', handleSignal);
+      cleanup();
 
       if (code === 0) {
         logger.spinnerSuccess('Scan completed successfully');
@@ -107,6 +177,7 @@ export async function runScan(options: RunScanOptions = {}): Promise<void> {
       // Remove signal handlers
       process.off('SIGINT', handleSignal);
       process.off('SIGTERM', handleSignal);
+      cleanup();
 
       logger.spinnerError('Failed to run react-scanner');
       logger.errorBox(

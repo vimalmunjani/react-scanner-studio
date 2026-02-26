@@ -136,7 +136,7 @@ react-scanner-studio build --ci
 
 ## 🔧 Configuration
 
-After running `init`, a `react-scanner.config.js` file is created in your project:
+After running `init`, a `react-scanner.config.js` file is created in your project (support for `.ts`, `.mjs`, etc., is also available):
 
 ```js
 module.exports = {

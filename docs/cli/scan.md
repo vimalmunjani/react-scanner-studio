@@ -16,7 +16,7 @@ react-scanner-studio scan
 
 The `scan` command invokes `react-scanner` as a child process to analyze your codebase and generate a component usage report. This is a convenience wrapper that:
 
-1. Locates your `react-scanner.config.js` file
+1. Locates your `react-scanner.config.*` file
 2. Runs `react-scanner` with the config file path
 3. Outputs the scan results to the location specified in your config
 
@@ -58,7 +58,7 @@ $ npx react-scanner-studio scan
 
 ## Config File Resolution
 
-The `scan` command searches for `react-scanner.config.js` starting from the current directory and moving upward through parent directories until it finds the config file. This allows you to run commands from any subdirectory within your project.
+The `scan` command searches for `react-scanner.config.*` (supporting `.js`, `.ts`, `.mjs`, etc.) starting from the current directory and moving upward through parent directories until it finds the config file. This allows you to run commands from any subdirectory within your project.
 
 For example, if your config is at `/my-project/react-scanner.config.js`, you can run the scan command from `/my-project/src/components/` and it will still find the config.
 
@@ -127,7 +127,7 @@ You can combine `scan` with `start` or `build` in your npm scripts:
 ╭─────────────────────────────────────────────╮
 │   Configuration Not Found                   │
 │                                             │
-│   No react-scanner.config.js found.         │
+│   No react-scanner.config.* found.          │
 │   Run react-scanner-studio init first to    │
 │   create the configuration.                 │
 ╰─────────────────────────────────────────────╯

@@ -72,11 +72,10 @@ async function handleScanReport(ciMode: boolean): Promise<boolean> {
   if (!configPath) {
     logger.errorBox(
       'Configuration Not Found',
-      `No ${logger.bold('react-scanner.config.js')} found.\nRun ${logger.bold('react-scanner-studio init')} first to create the configuration.`
+      `No ${logger.bold('react-scanner.config.*')} found.\nRun ${logger.bold('react-scanner-studio init')} first to create the configuration.`
     );
     return false;
   }
-
   const reportInfo = await checkScanReport();
 
   if (reportInfo.exists && reportInfo.modifiedAt) {

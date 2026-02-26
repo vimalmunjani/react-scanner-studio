@@ -1,10 +1,10 @@
 ---
-description: Configure React Scanner Studio with react-scanner.config.js — crawl paths, processors, and scan output options.
+description: Configure React Scanner Studio with react-scanner.config.* — support for .js, .ts, .mjs, and more.
 ---
 
 # Configuration
 
-React Scanner Studio uses the `react-scanner.config.js` configuration file to determine how to scan your codebase and where to output the results.
+React Scanner Studio uses the `react-scanner.config.*` configuration file to determine how to scan your codebase and where to output the results.
 
 ## Overview
 
@@ -25,13 +25,18 @@ module.exports = {
 };
 ```
 
-## Configuration File Location
+## Configuration File Support
 
-The configuration file must be named `react-scanner.config.js`. React Scanner Studio searches for this file starting from the current directory and moving upward through parent directories until it finds it. This allows you to run commands from any subdirectory within your project.
+While the `init` command creates a `react-scanner.config.js` file by default, React Scanner Studio supports several configuration file formats and extensions:
 
-```
+- **JavaScript**: `.js`, `.mjs`, `.cjs`
+- **TypeScript**: `.ts`, `.mts`, `.cts`
+
+The configuration file should be named `react-scanner.config` followed by one of these extensions. React Scanner Studio searches for this file starting from the current directory and moving upward through parent directories until it finds it. This allows you to run commands from any subdirectory within your project.
+
+```text
 your-project/
-├── react-scanner.config.js  ← Configuration file
+├── react-scanner.config.js  ← Configuration file (or .ts, .mjs, etc.)
 ├── package.json
 ├── src/
 │   └── ...

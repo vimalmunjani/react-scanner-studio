@@ -5,7 +5,14 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [1.1.1] - 2026-02-17
+## [1.2.0] - 2026-02-26
+
+### Added
+- **Configuration Flexibility**
+  - Added support for all `react-scanner.config.*` file extensions, including `.ts`, `.mjs`, `.cjs`, `.mts`, and `.cts`.
+  - Integrated `jiti` for seamless TypeScript and ES module configuration loading.
+
+## [1.1.0] - 2026-02-17
 
 ### Changed
 - Migrated UI build and development workflow from Vite to **Rspack** for compatibility and improved performance.
@@ -51,5 +58,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - CI/CD integration guides for GitHub Actions, GitLab CI, CircleCI, and Azure Pipelines
   - Troubleshooting guide
 
-[1.1.1]: https://github.com/vimalmunjani/react-scanner-studio/releases/tag/v1.1.1
+[1.2.0]: https://github.com/vimalmunjani/react-scanner-studio/releases/tag/v1.2.0
+[1.1.1]: https://github.com/vimalmunjani/react-scanner-studio/releases/tag/v1.1.0
 [1.0.0]: https://github.com/vimalmunjani/react-scanner-studio/releases/tag/v1.0.0

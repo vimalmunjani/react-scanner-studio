@@ -16,18 +16,18 @@ This guide covers common issues you may encounter when using React Scanner Studi
 ╭─────────────────────────────────────────────╮
 │   Configuration Not Found                   │
 │                                             │
-│   react-scanner.config.js not found.        │
+│   react-scanner.config.* not found.         │
 │   Run react-scanner-studio init first to    │
 │   create the configuration.                 │
 ╰─────────────────────────────────────────────╯
 ```
 
-**Cause:** The `react-scanner.config.js` file is missing. React Scanner Studio searches for this file starting from the current directory and moving upward through parent directories.
+**Cause:** The `react-scanner.config.*` file (e.g., `.js`, `.ts`, `.mjs`) is missing. React Scanner Studio searches for this file starting from the current directory and moving upward through parent directories.
 
 **Solution:**
 
 1. Run `npx react-scanner-studio init` to create the configuration file in your current directory
-2. Or manually create `react-scanner.config.js` in your project directory
+2. Or manually create a `react-scanner.config.js` (or `.ts`, `.mjs`, etc.) in your project directory
 
 ---
 
@@ -129,7 +129,7 @@ pnpm add --save-dev react-scanner
 **Possible Causes and Solutions:**
 
 1. **Wrong `crawlFrom` path**
-   - Verify the path in `react-scanner.config.js` points to your source directory
+   - Verify the path in your `react-scanner.config.*` points to your source directory
    - Use a relative path from the config file location (e.g., `./src`)
 
 2. **Wrong `importedFrom` value**
@@ -230,27 +230,26 @@ Error: EACCES: permission denied
 
 ---
 
-### ES Module Errors
+### ES Module and TypeScript Support
 
-**Error:**
+React Scanner Studio supports both CommonJS (`.js`, `.cjs`) and ES Modules (`.mjs`, `.js` with `"type": "module"`), as well as TypeScript (`.ts`).
 
-```
-Error: require() of ES Module not supported
-```
-
-**Cause:** Mixing CommonJS and ES modules incorrectly.
-
-**Solution:**
-Ensure your `react-scanner.config.js` uses CommonJS syntax:
+If you're using a `.js` file, ensure your syntax matches your project's module type:
 
 ```js
-// ✓ Correct (CommonJS)
+// CommonJS (react-scanner.config.js or .cjs)
 module.exports = {
   crawlFrom: './src',
   // ...
 };
 
-// ✗ Incorrect (ES Module)
+// ES Module (react-scanner.config.js with type: module, or .mjs)
+export default {
+  crawlFrom: './src',
+  // ...
+};
+
+// TypeScript (react-scanner.config.ts)
 export default {
   crawlFrom: './src',
   // ...
@@ -269,7 +268,7 @@ If you're still experiencing issues:
 
 2. **Open a New Issue**
    - Provide your Node.js version: `node --version`
-   - Include your `react-scanner.config.js`
+   - Include your `react-scanner.config.*`
    - Include the full error message
    - Describe the steps to reproduce
 

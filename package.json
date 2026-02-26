@@ -1,7 +1,7 @@
 {
   "name": "react-scanner-studio",
   "type": "module",
-  "version": "1.1.1",
+  "version": "1.2.0",
   "main": "dist/index.js",
   "files": [
     "dist",
@@ -93,6 +93,7 @@
     "commander": "^14.0.2",
     "embla-carousel-react": "^8.5.1",
     "input-otp": "^1.4.1",
+    "jiti": "^2.6.1",
     "lucide-react": "^0.468.0",
     "ora": "^9.0.0",
     "picocolors": "^1.1.1",

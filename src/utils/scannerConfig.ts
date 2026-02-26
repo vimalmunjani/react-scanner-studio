@@ -1,6 +1,9 @@
 import { existsSync, readFileSync, statSync } from 'fs';
 import { join, resolve, dirname } from 'path';
+import { createRequire } from 'module';
 import * as logger from './logger.js';
+
+const require = createRequire(import.meta.url);
 
 export interface ScannerConfig {
   crawlFrom?: string;
@@ -27,17 +30,21 @@ export interface ScanData {
   };
 }
 
+const CONFIG_FILE_NAME = 'react-scanner.config';
+const SUPPORTED_EXTENSIONS = ['.js', '.mjs', '.cjs', '.ts', '.mts', '.cts'];
+
 /**
- * Find the react-scanner.config.js file by searching upward from cwd
+ * Find the react-scanner.config.* file by searching upward from cwd
  */
 export function findConfigPath(): string | null {
   let dir = process.cwd();
 
   while (true) {
-    const configPath = join(dir, 'react-scanner.config.js');
-
-    if (existsSync(configPath)) {
-      return configPath;
+    for (const ext of SUPPORTED_EXTENSIONS) {
+      const configPath = join(dir, `${CONFIG_FILE_NAME}${ext}`);
+      if (existsSync(configPath)) {
+        return configPath;
+      }
     }
 
     const parentDir = dirname(dir);
@@ -52,7 +59,7 @@ export function findConfigPath(): string | null {
 }
 
 /**
- * Get the directory containing the react-scanner.config.js file
+ * Get the directory containing the react-scanner.config.* file
  */
 export function getConfigDir(): string | null {
   const configPath = findConfigPath();
@@ -63,7 +70,27 @@ export function getConfigDir(): string | null {
 }
 
 /**
- * Read and parse the react-scanner.config.js file
+ * Load the scanner configuration using jiti
+ */
+async function loadConfig(configPath: string): Promise<ScannerConfig | null> {
+  try {
+    const { createJiti } = require('jiti');
+    const jiti = createJiti(import.meta.url);
+    const config = await jiti.import(configPath);
+    return config.default || config;
+  } catch (error) {
+    // Fallback to dynamic import if jiti fails or is not available
+    try {
+      const config = await import(configPath);
+      return config.default || config;
+    } catch (innerError) {
+      throw new Error(`Failed to load config: ${error}\n${innerError}`);
+    }
+  }
+}
+
+/**
+ * Read and parse the react-scanner.config.* file
  */
 export async function readScannerConfig(): Promise<ScannerConfig | null> {
   const configPath = findConfigPath();
@@ -71,19 +98,17 @@ export async function readScannerConfig(): Promise<ScannerConfig | null> {
   if (!configPath) {
     logger.errorBox(
       'Configuration Not Found',
-      `${logger.bold('react-scanner.config.js')} not found.\nRun ${logger.bold('react-scanner-studio init')} first to create the configuration.`
+      `${logger.bold(`${CONFIG_FILE_NAME}.*`)} not found.\nRun ${logger.bold('react-scanner-studio init')} first to create the configuration.`
     );
     return null;
   }
 
   try {
-    // Use dynamic import for ES modules
-    const config = await import(configPath);
-    return config.default || config;
+    return await loadConfig(configPath);
   } catch (error) {
     logger.errorBox(
       'Configuration Error',
-      `Failed to read react-scanner.config.js\n${error}`
+      `Failed to read configuration file at ${configPath}\n${error}`
     );
     return null;
   }
@@ -167,7 +192,7 @@ export async function getScanData(): Promise<{
 }> {
   const config = await readScannerConfig();
   if (!config) {
-    return { data: null, error: 'Could not read react-scanner.config.js' };
+    return { data: null, error: 'Could not read configuration file' };
   }
 
   const scanFile = getOutputFile(config);
@@ -277,8 +302,7 @@ export async function readScannerConfigSilent(): Promise<ScannerConfig | null> {
   }
 
   try {
-    const config = await import(configPath);
-    return config.default || config;
+    return await loadConfig(configPath);
   } catch {
     return null;
   }

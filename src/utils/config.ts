@@ -161,12 +161,12 @@ export function createReactScannerConfig(
 
   if (existingConfigPath) {
     logger.info(
-      `react-scanner.config.js already exists at ${existingConfigPath}`
+      `react-scanner.config.* already exists at ${existingConfigPath}`
     );
     return false;
   }
 
-  // Create config in current directory
+  // Create config in current directory - default to .js for compatibility
   const configPath = join(process.cwd(), 'react-scanner.config.js');
 
   const configContent = `module.exports = {
@@ -181,12 +181,12 @@ export function createReactScannerConfig(
 
   try {
     writeFileSync(configPath, configContent);
-    logger.success('Created react-scanner.config.js');
+    logger.success('Created configuration file: react-scanner.config.js');
     return true;
   } catch (error) {
     logger.errorBox(
       'Configuration Error',
-      `Failed to create react-scanner.config.js\n${error}`
+      `Failed to create configuration file\n${error}`
     );
     return false;
   }

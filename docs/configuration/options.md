@@ -1,15 +1,15 @@
 # Configuration Options
 
-This page documents all the configuration options available in `react-scanner.config.js`.
+This page documents all the configuration options available in `react-scanner.config.*`.
 
 ## Overview
 
-React Scanner Studio uses the standard `react-scanner` configuration file. The `init` command creates a basic configuration, but you can customize it to fit your needs.
+React Scanner Studio uses the standard `react-scanner` configuration file. The `init` command creates a basic configuration, but you can customize it to fit your needs (supporting `.js`, `.ts`, `.mjs`, etc.).
 
 ## Basic Configuration
 
 ```js
-// react-scanner.config.js
+// react-scanner.config.js (or .ts, .mjs, etc.)
 module.exports = {
   crawlFrom: './src',
   includeSubComponents: true,
