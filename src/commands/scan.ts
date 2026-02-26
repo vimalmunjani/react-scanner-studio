@@ -1,7 +1,7 @@
 import { Command } from 'commander';
 import { spawn } from 'child_process';
 import { writeFileSync, unlinkSync, existsSync, mkdirSync } from 'fs';
-import { join, extname } from 'path';
+import { join, extname, resolve, isAbsolute, dirname } from 'path';
 import { createRequire } from 'module';
 import { checkPeerDependency } from '../utils/dependencies.js';
 import { logger } from '../utils/index.js';
@@ -57,6 +57,39 @@ export async function runScan(options: RunScanOptions = {}): Promise<void> {
       const jiti = createJiti(import.meta.url);
       const configContent = await jiti.import(configPath);
       const config = configContent.default || configContent;
+
+      const originalConfigDir = dirname(configPath);
+
+      // Resolve relative paths to absolute paths to prevent issues with temp file location
+      if (
+        config.crawlFrom &&
+        typeof config.crawlFrom === 'string' &&
+        !isAbsolute(config.crawlFrom)
+      ) {
+        config.crawlFrom = resolve(originalConfigDir, config.crawlFrom);
+      }
+
+      if (Array.isArray(config.processors)) {
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        config.processors = config.processors.map((p: any) => {
+          if (
+            Array.isArray(p) &&
+            p[1] &&
+            p[1].outputTo &&
+            typeof p[1].outputTo === 'string' &&
+            !isAbsolute(p[1].outputTo)
+          ) {
+            // Clone the config object to avoid mutating the original if possible
+            const processorConfig = { ...p[1] };
+            processorConfig.outputTo = resolve(
+              originalConfigDir,
+              p[1].outputTo
+            );
+            return [p[0], processorConfig];
+          }
+          return p;
+        });
+      }
 
       const tempDir = join(process.cwd(), '.react-scanner-studio', 'temp');
       if (!existsSync(tempDir)) {
