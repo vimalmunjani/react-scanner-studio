@@ -1,7 +1,7 @@
 import { Command } from 'commander';
 import { spawn } from 'child_process';
 import { writeFileSync, unlinkSync, existsSync, mkdirSync } from 'fs';
-import { join, extname, resolve, isAbsolute, dirname } from 'path';
+import { join, resolve, isAbsolute, dirname } from 'path';
 import { createRequire } from 'module';
 import { checkPeerDependency } from '../utils/dependencies.js';
 import { logger } from '../utils/index.js';
@@ -45,90 +45,81 @@ export async function runScan(options: RunScanOptions = {}): Promise<void> {
 
   logger.startSpinner('Running react-scanner...');
 
-  // Handle non-js config files by transforming them with jiti
+  // Handle all config files by transforming them with jiti to ensure compatibility
+  // with react-scanner's loader (especially for ESM/TypeScript/etc)
   let finalConfigPath = configPath;
-  const isNonJs =
-    extname(configPath) !== '.js' && extname(configPath) !== '.cjs';
   let tempConfigPath: string | null = null;
 
-  if (isNonJs) {
-    try {
-      const { createJiti } = require('jiti');
-      const jiti = createJiti(import.meta.url);
-      const configContent = await jiti.import(configPath);
-      const config = configContent.default || configContent;
+  try {
+    const { createJiti } = require('jiti');
+    const jiti = createJiti(import.meta.url);
+    const configContent = await jiti.import(configPath);
+    const config = configContent.default || configContent;
 
-      const originalConfigDir = dirname(configPath);
+    const originalConfigDir = dirname(configPath);
 
-      // Resolve relative paths to absolute paths to prevent issues with temp file location
-      if (
-        config.crawlFrom &&
-        typeof config.crawlFrom === 'string' &&
-        !isAbsolute(config.crawlFrom)
-      ) {
-        config.crawlFrom = resolve(originalConfigDir, config.crawlFrom);
-      }
-
-      if (Array.isArray(config.processors)) {
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        config.processors = config.processors.map((p: any) => {
-          if (
-            Array.isArray(p) &&
-            p[1] &&
-            p[1].outputTo &&
-            typeof p[1].outputTo === 'string' &&
-            !isAbsolute(p[1].outputTo)
-          ) {
-            // Clone the config object to avoid mutating the original if possible
-            const processorConfig = { ...p[1] };
-            processorConfig.outputTo = resolve(
-              originalConfigDir,
-              p[1].outputTo
-            );
-            return [p[0], processorConfig];
-          }
-          return p;
-        });
-      }
-
-      const tempDir = join(process.cwd(), '.react-scanner-studio', 'temp');
-      if (!existsSync(tempDir)) {
-        mkdirSync(tempDir, { recursive: true });
-      }
-
-      tempConfigPath = join(
-        tempDir,
-        `react-scanner.config.tmp-${Date.now()}.cjs`
-      );
-
-      // Simple serialization for config object
-      // For complex configs with deep functions/regex, we might need a more sophisticated approach
-      // but this handles most react-scanner config needs.
-      const serialize = (obj: unknown): string => {
-        if (obj instanceof RegExp) return obj.toString();
-        if (typeof obj === 'function') return obj.toString();
-        if (Array.isArray(obj))
-          return `[${obj.map(item => serialize(item)).join(', ')}]`;
-        if (typeof obj === 'object' && obj !== null) {
-          return `{ ${Object.entries(obj)
-            .map(([k, v]) => `"${k}": ${serialize(v)}`)
-            .join(', ')} }`;
-        }
-        return JSON.stringify(obj);
-      };
-
-      const serializedConfig = `module.exports = ${serialize(config)};`;
-
-      writeFileSync(tempConfigPath, serializedConfig);
-      finalConfigPath = tempConfigPath;
-    } catch (error) {
-      logger.spinnerError('Failed to process configuration file');
-      logger.errorBox(
-        'Config Error',
-        `Could not transform ${extname(configPath)} config: ${error}`
-      );
-      throw error;
+    // Resolve relative paths to absolute paths to prevent issues with temp file location
+    if (
+      config.crawlFrom &&
+      typeof config.crawlFrom === 'string' &&
+      !isAbsolute(config.crawlFrom)
+    ) {
+      config.crawlFrom = resolve(originalConfigDir, config.crawlFrom);
     }
+
+    if (Array.isArray(config.processors)) {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      config.processors = config.processors.map((p: any) => {
+        if (
+          Array.isArray(p) &&
+          p[1] &&
+          p[1].outputTo &&
+          typeof p[1].outputTo === 'string' &&
+          !isAbsolute(p[1].outputTo)
+        ) {
+          const processorConfig = { ...p[1] };
+          processorConfig.outputTo = resolve(originalConfigDir, p[1].outputTo);
+          return [p[0], processorConfig];
+        }
+        return p;
+      });
+    }
+
+    const tempDir = join(process.cwd(), '.react-scanner-studio', 'temp');
+    if (!existsSync(tempDir)) {
+      mkdirSync(tempDir, { recursive: true });
+    }
+
+    tempConfigPath = join(
+      tempDir,
+      `react-scanner.config.tmp-${Date.now()}.cjs`
+    );
+
+    // Simple serialization for config object
+    const serialize = (obj: unknown): string => {
+      if (obj instanceof RegExp) return obj.toString();
+      if (typeof obj === 'function') return obj.toString();
+      if (Array.isArray(obj))
+        return `[${obj.map(item => serialize(item)).join(', ')}]`;
+      if (typeof obj === 'object' && obj !== null) {
+        return `{ ${Object.entries(obj)
+          .map(([k, v]) => `"${k}": ${serialize(v)}`)
+          .join(', ')} }`;
+      }
+      return JSON.stringify(obj);
+    };
+
+    const serializedConfig = `module.exports = ${serialize(config)};`;
+
+    writeFileSync(tempConfigPath, serializedConfig);
+    finalConfigPath = tempConfigPath;
+  } catch (error) {
+    logger.spinnerError('Failed to process configuration file');
+    logger.errorBox(
+      'Config Error',
+      `Could not transform configuration: ${error}`
+    );
+    throw error;
   }
 
   const cleanup = () => {
