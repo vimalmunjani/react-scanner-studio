@@ -5,12 +5,13 @@
 React Scanner Studio helps you track design system adoption, discover unused components, and analyze prop usage patterns by generating a beautiful, shareable local dashboard.
 
 <div align="center">
-  <img src="https://raw.githubusercontent.com/vimalmunjani/react-scanner-studio/main/logo.png" alt="React Scanner Studio Logo" width="150" height="150">
-</div>
+  <img src="./logo.png" alt="React Scanner Studio Logo" width="150" height="150">
+  <h3>React Scanner Studio</h3>
 
-[![npm version](https://img.shields.io/npm/v/react-scanner-studio.svg)](https://www.npmjs.com/package/react-scanner-studio)
-[![GitHub stars](https://img.shields.io/github/stars/vimalmunjani/react-scanner-studio?style=social)](https://github.com/vimalmunjani/react-scanner-studio/stargazers)
-[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+  [![npm version](https://img.shields.io/npm/v/react-scanner-studio.svg)](https://www.npmjs.com/package/react-scanner-studio)
+  [![GitHub stars](https://img.shields.io/github/stars/vimalmunjani/react-scanner-studio?style=social)](https://github.com/vimalmunjani/react-scanner-studio/stargazers)
+  [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+</div>
 
 ---
 
