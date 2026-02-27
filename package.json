@@ -1,7 +1,7 @@
 {
   "name": "react-scanner-studio",
   "type": "module",
-  "version": "1.2.3",
+  "version": "1.2.4",
   "description": "A portable, interactive dashboard for analyzing React component usage, tracking design system adoption, and discovering unused components across your codebase.",
   "main": "dist/index.js",
   "files": [
