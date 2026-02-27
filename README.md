@@ -1,23 +1,27 @@
-<div align="center">
-  <img src="./logo.png" alt="React Scanner Studio Logo" width="150" height="150">
-  <h1>React Scanner Studio</h1>
-  <p>A portable, interactive dashboard for analyzing React component usage across your codebase.</p>
+# React Scanner Studio
 
-  [![npm version](https://img.shields.io/npm/v/react-scanner-studio.svg)](https://www.npmjs.com/package/react-scanner-studio)
-  [![GitHub stars](https://img.shields.io/github/stars/vimalmunjani/react-scanner-studio?style=social)](https://github.com/vimalmunjani/react-scanner-studio/stargazers)
-  [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+**A portable, interactive dashboard for analyzing React component usage across your codebase.**
+
+React Scanner Studio helps you track design system adoption, discover unused components, and analyze prop usage patterns by generating a beautiful, shareable local dashboard.
+
+<div align="center">
+  <img src="https://raw.githubusercontent.com/vimalmunjani/react-scanner-studio/main/logo.png" alt="React Scanner Studio Logo" width="150" height="150">
 </div>
+
+[![npm version](https://img.shields.io/npm/v/react-scanner-studio.svg)](https://www.npmjs.com/package/react-scanner-studio)
+[![GitHub stars](https://img.shields.io/github/stars/vimalmunjani/react-scanner-studio?style=social)](https://github.com/vimalmunjani/react-scanner-studio/stargazers)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
 ---
 
 ## ✨ Features
 
-- 🔍 **Component Scanning** — Leverages react-scanner to analyze React component usage across your entire codebase
-- 📊 **Interactive Dashboard** — Beautiful UI for exploring component statistics, prop usage patterns, and adoption metrics
-- 📦 **Portable Build** — Generate static HTML files that can be hosted anywhere or shared with your team — no server required
-- ⚡ **Zero Config Setup** — Get started in seconds with the `init` command that automatically configures everything
-- 🎨 **Design System Tracking** — Perfect for tracking design system component adoption across multiple projects
-- 🔧 **CI/CD Ready** — Built-in CI mode for seamless integration with your continuous integration pipelines
+- 🔍 **React Component Scanning** — Leverages powerful AST parsing (`react-scanner`) to accurately analyze React component usage across your entire frontend codebase
+- 📊 **Component Analytics Dashboard** — A beautiful, interactive UI for exploring component statistics, discovering prop usage patterns, and identifying unused components
+- 📦 **Portable Static Build** — Generate static HTML reports that can be hosted anywhere (GitHub Pages, Vercel, Netlify) or shared with your team—no server required
+- ⚡ **Zero Config Setup** — Get started in seconds with the `init` command that automatically configures everything for Next.js, Vite, or Create React App projects
+- 🎨 **Design System Observability** — Perfect for tracking design system component adoption, evaluating UI consistency, and planning migrations
+- 🔧 **CI/CD Ready** — Built-in CI mode for seamless integration with GitHub Actions and other continuous integration pipelines to generate automated usage metrics
 
 ## 📖 Documentation
 
@@ -128,11 +132,11 @@ react-scanner-studio build --ci
 
 ## 🎯 Use Cases
 
-- **Design System Adoption** — Track how your design system components are being used across teams
-- **Component Analytics** — Understand which components are most popular and which are underutilized
-- **Prop Pattern Analysis** — Discover common prop combinations and usage patterns
-- **Migration Planning** — Identify components that need to be migrated or deprecated
-- **Documentation** — Generate shareable reports for stakeholders
+- **Design System Observability & Adoption** — Track how your React design system components are being utilized across different teams and repositories.
+- **Frontend Codebase Analytics** — Understand which React components are most popular, which are underutilized, and identify candidates for deprecation.
+- **Prop Pattern Analysis** — Discover common prop combinations, hardcoded values, and usage patterns to optimize component APIs.
+- **Safe Refactoring & Migration Planning** — Identify all locations a component is used before modifying its API, deprecating it, or migrating to a new library (e.g., from MUI to Tailwind).
+- **Automated Documentation** — Generate shareable component usage reports for stakeholders and design teams.
 
 ## 🔧 Configuration
 
