@@ -1,0 +1,17 @@
+{
+  "name": "test-fixture",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Test fixture for react-scanner-studio manual testing",
+  "scripts": {
+    "scan": "node ../dist/index.js scan",
+    "start": "node ../dist/index.js start --ci"
+  },
+  "dependencies": {
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1"
+  },
+  "peerDependencies": {
+    "react-scanner": ">=1.2.0"
+  }
+}

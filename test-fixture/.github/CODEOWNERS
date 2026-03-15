@@ -1,0 +1,11 @@
+# Global fallback — design system team owns shared components
+/src/components/ @org/design-system
+
+# Auth feature — owned by identity team
+/src/features/auth/
+
+# Checkout feature — owned by payments team
+/src/features/checkout/
+
+# Pages — shared ownership
+/src/pages/ @org/frontend @charlie

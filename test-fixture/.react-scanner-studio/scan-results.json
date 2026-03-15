@@ -1,0 +1,533 @@
+{
+  "Button": {
+    "instances": [
+      {
+        "importInfo": {
+          "imported": "Button",
+          "local": "Button",
+          "moduleName": "./Button",
+          "importType": "ImportSpecifier"
+        },
+        "props": {
+          "label": "Close",
+          "variant": "secondary",
+          "onClick": "(Identifier)"
+        },
+        "propsSpread": false,
+        "location": {
+          "file": "/Users/vimalmunjani/Desktop/EXP/react-scanner-studio/.claude/worktrees/bold-sinoussi/test-fixture/src/components/Modal.tsx",
+          "start": {
+            "line": 17,
+            "column": 7
+          }
+        }
+      },
+      {
+        "importInfo": {
+          "imported": "Button",
+          "local": "Button",
+          "moduleName": "../../components/Button",
+          "importType": "ImportSpecifier"
+        },
+        "props": {
+          "label": "Log In",
+          "variant": "primary"
+        },
+        "propsSpread": false,
+        "location": {
+          "file": "/Users/vimalmunjani/Desktop/EXP/react-scanner-studio/.claude/worktrees/bold-sinoussi/test-fixture/src/features/auth/LoginForm.tsx",
+          "start": {
+            "line": 10,
+            "column": 7
+          }
+        }
+      },
+      {
+        "importInfo": {
+          "imported": "Button",
+          "local": "Button",
+          "moduleName": "../../components/Button",
+          "importType": "ImportSpecifier"
+        },
+        "props": {
+          "label": "Forgot Password",
+          "variant": "secondary",
+          "disabled": null
+        },
+        "propsSpread": false,
+        "location": {
+          "file": "/Users/vimalmunjani/Desktop/EXP/react-scanner-studio/.claude/worktrees/bold-sinoussi/test-fixture/src/features/auth/LoginForm.tsx",
+          "start": {
+            "line": 11,
+            "column": 7
+          }
+        }
+      },
+      {
+        "importInfo": {
+          "imported": "Button",
+          "local": "Button",
+          "moduleName": "../../components/Button",
+          "importType": "ImportSpecifier"
+        },
+        "props": {
+          "label": "Create Account",
+          "variant": "primary"
+        },
+        "propsSpread": false,
+        "location": {
+          "file": "/Users/vimalmunjani/Desktop/EXP/react-scanner-studio/.claude/worktrees/bold-sinoussi/test-fixture/src/features/auth/SignupForm.tsx",
+          "start": {
+            "line": 12,
+            "column": 7
+          }
+        }
+      },
+      {
+        "importInfo": {
+          "imported": "Button",
+          "local": "Button",
+          "moduleName": "../../components/Button",
+          "importType": "ImportSpecifier"
+        },
+        "props": {
+          "label": "Pay Now",
+          "variant": "primary"
+        },
+        "propsSpread": false,
+        "location": {
+          "file": "/Users/vimalmunjani/Desktop/EXP/react-scanner-studio/.claude/worktrees/bold-sinoussi/test-fixture/src/features/checkout/CheckoutForm.tsx",
+          "start": {
+            "line": 12,
+            "column": 7
+          }
+        }
+      },
+      {
+        "importInfo": {
+          "imported": "Button",
+          "local": "Button",
+          "moduleName": "../../components/Button",
+          "importType": "ImportSpecifier"
+        },
+        "props": {
+          "label": "Cancel",
+          "variant": "danger"
+        },
+        "propsSpread": false,
+        "location": {
+          "file": "/Users/vimalmunjani/Desktop/EXP/react-scanner-studio/.claude/worktrees/bold-sinoussi/test-fixture/src/features/checkout/CheckoutForm.tsx",
+          "start": {
+            "line": 13,
+            "column": 7
+          }
+        }
+      },
+      {
+        "importInfo": {
+          "imported": "Button",
+          "local": "Button",
+          "moduleName": "../components/Button",
+          "importType": "ImportSpecifier"
+        },
+        "props": {
+          "label": "Get Started",
+          "variant": "primary"
+        },
+        "propsSpread": false,
+        "location": {
+          "file": "/Users/vimalmunjani/Desktop/EXP/react-scanner-studio/.claude/worktrees/bold-sinoussi/test-fixture/src/pages/HomePage.tsx",
+          "start": {
+            "line": 10,
+            "column": 7
+          }
+        }
+      },
+      {
+        "importInfo": {
+          "imported": "Button",
+          "local": "Button",
+          "moduleName": "../components/Button",
+          "importType": "ImportSpecifier"
+        },
+        "props": {
+          "label": "Learn More",
+          "variant": "secondary"
+        },
+        "propsSpread": false,
+        "location": {
+          "file": "/Users/vimalmunjani/Desktop/EXP/react-scanner-studio/.claude/worktrees/bold-sinoussi/test-fixture/src/pages/HomePage.tsx",
+          "start": {
+            "line": 11,
+            "column": 7
+          }
+        }
+      }
+    ]
+  },
+  "Input": {
+    "instances": [
+      {
+        "importInfo": {
+          "imported": "Input",
+          "local": "Input",
+          "moduleName": "../../components/Input",
+          "importType": "ImportSpecifier"
+        },
+        "props": {
+          "type": "email",
+          "placeholder": "Email"
+        },
+        "propsSpread": false,
+        "location": {
+          "file": "/Users/vimalmunjani/Desktop/EXP/react-scanner-studio/.claude/worktrees/bold-sinoussi/test-fixture/src/features/auth/LoginForm.tsx",
+          "start": {
+            "line": 8,
+            "column": 7
+          }
+        }
+      },
+      {
+        "importInfo": {
+          "imported": "Input",
+          "local": "Input",
+          "moduleName": "../../components/Input",
+          "importType": "ImportSpecifier"
+        },
+        "props": {
+          "type": "password",
+          "placeholder": "Password"
+        },
+        "propsSpread": false,
+        "location": {
+          "file": "/Users/vimalmunjani/Desktop/EXP/react-scanner-studio/.claude/worktrees/bold-sinoussi/test-fixture/src/features/auth/LoginForm.tsx",
+          "start": {
+            "line": 9,
+            "column": 7
+          }
+        }
+      },
+      {
+        "importInfo": {
+          "imported": "Input",
+          "local": "Input",
+          "moduleName": "../../components/Input",
+          "importType": "ImportSpecifier"
+        },
+        "props": {
+          "placeholder": "Full Name"
+        },
+        "propsSpread": false,
+        "location": {
+          "file": "/Users/vimalmunjani/Desktop/EXP/react-scanner-studio/.claude/worktrees/bold-sinoussi/test-fixture/src/features/auth/SignupForm.tsx",
+          "start": {
+            "line": 9,
+            "column": 7
+          }
+        }
+      },
+      {
+        "importInfo": {
+          "imported": "Input",
+          "local": "Input",
+          "moduleName": "../../components/Input",
+          "importType": "ImportSpecifier"
+        },
+        "props": {
+          "type": "email",
+          "placeholder": "Email"
+        },
+        "propsSpread": false,
+        "location": {
+          "file": "/Users/vimalmunjani/Desktop/EXP/react-scanner-studio/.claude/worktrees/bold-sinoussi/test-fixture/src/features/auth/SignupForm.tsx",
+          "start": {
+            "line": 10,
+            "column": 7
+          }
+        }
+      },
+      {
+        "importInfo": {
+          "imported": "Input",
+          "local": "Input",
+          "moduleName": "../../components/Input",
+          "importType": "ImportSpecifier"
+        },
+        "props": {
+          "type": "password",
+          "placeholder": "Password"
+        },
+        "propsSpread": false,
+        "location": {
+          "file": "/Users/vimalmunjani/Desktop/EXP/react-scanner-studio/.claude/worktrees/bold-sinoussi/test-fixture/src/features/auth/SignupForm.tsx",
+          "start": {
+            "line": 11,
+            "column": 7
+          }
+        }
+      },
+      {
+        "importInfo": {
+          "imported": "Input",
+          "local": "Input",
+          "moduleName": "../../components/Input",
+          "importType": "ImportSpecifier"
+        },
+        "props": {
+          "placeholder": "Card Number"
+        },
+        "propsSpread": false,
+        "location": {
+          "file": "/Users/vimalmunjani/Desktop/EXP/react-scanner-studio/.claude/worktrees/bold-sinoussi/test-fixture/src/features/checkout/CheckoutForm.tsx",
+          "start": {
+            "line": 9,
+            "column": 7
+          }
+        }
+      },
+      {
+        "importInfo": {
+          "imported": "Input",
+          "local": "Input",
+          "moduleName": "../../components/Input",
+          "importType": "ImportSpecifier"
+        },
+        "props": {
+          "placeholder": "CVV"
+        },
+        "propsSpread": false,
+        "location": {
+          "file": "/Users/vimalmunjani/Desktop/EXP/react-scanner-studio/.claude/worktrees/bold-sinoussi/test-fixture/src/features/checkout/CheckoutForm.tsx",
+          "start": {
+            "line": 10,
+            "column": 7
+          }
+        }
+      },
+      {
+        "importInfo": {
+          "imported": "Input",
+          "local": "Input",
+          "moduleName": "../../components/Input",
+          "importType": "ImportSpecifier"
+        },
+        "props": {
+          "placeholder": "Expiry Date"
+        },
+        "propsSpread": false,
+        "location": {
+          "file": "/Users/vimalmunjani/Desktop/EXP/react-scanner-studio/.claude/worktrees/bold-sinoussi/test-fixture/src/features/checkout/CheckoutForm.tsx",
+          "start": {
+            "line": 11,
+            "column": 7
+          }
+        }
+      },
+      {
+        "importInfo": {
+          "imported": "Input",
+          "local": "Input",
+          "moduleName": "../components/Input",
+          "importType": "ImportSpecifier"
+        },
+        "props": {
+          "placeholder": "Search..."
+        },
+        "propsSpread": false,
+        "location": {
+          "file": "/Users/vimalmunjani/Desktop/EXP/react-scanner-studio/.claude/worktrees/bold-sinoussi/test-fixture/src/pages/HomePage.tsx",
+          "start": {
+            "line": 12,
+            "column": 7
+          }
+        }
+      }
+    ]
+  },
+  "Modal": {
+    "instances": [
+      {
+        "importInfo": {
+          "imported": "Modal",
+          "local": "Modal",
+          "moduleName": "../../components/Modal",
+          "importType": "ImportSpecifier"
+        },
+        "props": {
+          "title": "Terms of Service",
+          "open": false
+        },
+        "propsSpread": false,
+        "location": {
+          "file": "/Users/vimalmunjani/Desktop/EXP/react-scanner-studio/.claude/worktrees/bold-sinoussi/test-fixture/src/features/auth/SignupForm.tsx",
+          "start": {
+            "line": 13,
+            "column": 7
+          }
+        }
+      },
+      {
+        "importInfo": {
+          "imported": "Modal",
+          "local": "Modal",
+          "moduleName": "../../components/Modal",
+          "importType": "ImportSpecifier"
+        },
+        "props": {
+          "title": "Payment Confirmation",
+          "open": false
+        },
+        "propsSpread": false,
+        "location": {
+          "file": "/Users/vimalmunjani/Desktop/EXP/react-scanner-studio/.claude/worktrees/bold-sinoussi/test-fixture/src/features/checkout/CheckoutForm.tsx",
+          "start": {
+            "line": 14,
+            "column": 7
+          }
+        }
+      },
+      {
+        "importInfo": {
+          "imported": "Modal",
+          "local": "Modal",
+          "moduleName": "../components/Modal",
+          "importType": "ImportSpecifier"
+        },
+        "props": {
+          "title": "Welcome",
+          "open": false
+        },
+        "propsSpread": false,
+        "location": {
+          "file": "/Users/vimalmunjani/Desktop/EXP/react-scanner-studio/.claude/worktrees/bold-sinoussi/test-fixture/src/pages/HomePage.tsx",
+          "start": {
+            "line": 13,
+            "column": 7
+          }
+        }
+      }
+    ]
+  },
+  "__codeowners": {
+    "owners": [
+      {
+        "owner": "@org/identity-team",
+        "totalInstances": 9,
+        "uniqueComponents": 3,
+        "fileCount": 2,
+        "components": [
+          {
+            "name": "Input",
+            "instances": 5
+          },
+          {
+            "name": "Button",
+            "instances": 3
+          },
+          {
+            "name": "Modal",
+            "instances": 1
+          }
+        ],
+        "files": [
+          "src/features/auth/LoginForm.tsx",
+          "src/features/auth/SignupForm.tsx"
+        ]
+      },
+      {
+        "owner": "@alice",
+        "totalInstances": 9,
+        "uniqueComponents": 3,
+        "fileCount": 2,
+        "components": [
+          {
+            "name": "Input",
+            "instances": 5
+          },
+          {
+            "name": "Button",
+            "instances": 3
+          },
+          {
+            "name": "Modal",
+            "instances": 1
+          }
+        ],
+        "files": [
+          "src/features/auth/LoginForm.tsx",
+          "src/features/auth/SignupForm.tsx"
+        ]
+      },
+      {
+        "owner": "@org/frontend",
+        "totalInstances": 4,
+        "uniqueComponents": 3,
+        "fileCount": 1,
+        "components": [
+          {
+            "name": "Button",
+            "instances": 2
+          },
+          {
+            "name": "Input",
+            "instances": 1
+          },
+          {
+            "name": "Modal",
+            "instances": 1
+          }
+        ],
+        "files": ["src/pages/HomePage.tsx"]
+      },
+      {
+        "owner": "@charlie",
+        "totalInstances": 4,
+        "uniqueComponents": 3,
+        "fileCount": 1,
+        "components": [
+          {
+            "name": "Button",
+            "instances": 2
+          },
+          {
+            "name": "Input",
+            "instances": 1
+          },
+          {
+            "name": "Modal",
+            "instances": 1
+          }
+        ],
+        "files": ["src/pages/HomePage.tsx"]
+      },
+      {
+        "owner": "@org/design-system",
+        "totalInstances": 1,
+        "uniqueComponents": 1,
+        "fileCount": 1,
+        "components": [
+          {
+            "name": "Button",
+            "instances": 1
+          }
+        ],
+        "files": ["src/components/Modal.tsx"]
+      }
+    ],
+    "totalOwners": 5,
+    "totalInstances": 27,
+    "unownedFiles": ["src/features/checkout/CheckoutForm.tsx"],
+    "unownedInstances": 6,
+    "mostSharedComponent": {
+      "name": "Button",
+      "ownerCount": 5,
+      "owners": [
+        "@org/design-system",
+        "@org/identity-team",
+        "@alice",
+        "@org/frontend",
+        "@charlie"
+      ]
+    }
+  }
+}
