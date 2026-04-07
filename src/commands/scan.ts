@@ -5,7 +5,11 @@ import { join, resolve, isAbsolute, dirname } from 'path';
 import { createRequire } from 'module';
 import { checkPeerDependency } from '../utils/dependencies.js';
 import { logger } from '../utils/index.js';
-import { findConfigPath } from '../utils/scannerConfig.js';
+import { findConfigPath, getOutputFile } from '../utils/scannerConfig.js';
+import {
+  findCodeownersFile,
+  enrichScanFileWithCodeowners,
+} from '../utils/codeowners.js';
 
 const require = createRequire(import.meta.url);
 
@@ -49,6 +53,9 @@ export async function runScan(options: RunScanOptions = {}): Promise<void> {
   // with react-scanner's loader (especially for ESM/TypeScript/etc)
   let finalConfigPath = configPath;
   let tempConfigPath: string | null = null;
+  // Captured for codeowners enrichment after scan
+  let absoluteScanOutputPath: string | null = null;
+  const repoRoot = dirname(configPath);
 
   try {
     const { createJiti } = require('jiti');
@@ -113,6 +120,14 @@ export async function runScan(options: RunScanOptions = {}): Promise<void> {
 
     writeFileSync(tempConfigPath, serializedConfig);
     finalConfigPath = tempConfigPath;
+
+    // Capture the absolute scan output path for codeowners enrichment
+    const outputFile = getOutputFile(config);
+    if (outputFile) {
+      absoluteScanOutputPath = isAbsolute(outputFile)
+        ? outputFile
+        : resolve(originalConfigDir, outputFile);
+    }
   } catch (error) {
     logger.spinnerError('Failed to process configuration file');
     logger.errorBox(
@@ -167,6 +182,21 @@ export async function runScan(options: RunScanOptions = {}): Promise<void> {
 
       if (code === 0) {
         logger.spinnerSuccess('Scan completed successfully');
+
+        // Enrich scan output with CODEOWNERS data (non-fatal)
+        if (absoluteScanOutputPath && findCodeownersFile(repoRoot)) {
+          try {
+            const enriched = enrichScanFileWithCodeowners(
+              absoluteScanOutputPath,
+              repoRoot
+            );
+            if (enriched) {
+              logger.spinnerSuccess('Code owners data collected');
+            }
+          } catch {
+            // Non-fatal — codeowners enrichment failure should not block scan
+          }
+        }
 
         if (showSuccessBox) {
           // Show output location info

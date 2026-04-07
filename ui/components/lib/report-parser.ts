@@ -65,6 +65,7 @@ function detectFormat(data: unknown): ReportFormat | null {
   let hasNumberInstances = false;
 
   for (const key of keys) {
+    if (key.startsWith('__')) continue;
     const value = obj[key];
 
     if (typeof value === 'number') {
@@ -97,6 +98,7 @@ function normalizeCountComponents(
   const results: NormalizedComponent[] = [];
 
   for (const [name, value] of Object.entries(data)) {
+    if (name.startsWith('__')) continue;
     if (typeof value === 'number') {
       results.push({
         name,
@@ -118,6 +120,7 @@ function normalizeCountComponentsAndProps(
   const results: NormalizedComponent[] = [];
 
   for (const [name, value] of Object.entries(data)) {
+    if (name.startsWith('__')) continue;
     if (typeof value !== 'object' || value === null) continue;
 
     const entry = value as Record<string, unknown>;
@@ -168,6 +171,7 @@ function normalizeRawReport(
   const results: NormalizedComponent[] = [];
 
   for (const [name, value] of Object.entries(data)) {
+    if (name.startsWith('__')) continue;
     if (typeof value !== 'object' || value === null) continue;
 
     const entry = value as Record<string, unknown>;

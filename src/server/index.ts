@@ -1,6 +1,7 @@
 import { resolve, dirname } from 'path';
 import { fileURLToPath } from 'url';
 import { getScanData } from '../utils/scannerConfig.js';
+import { getCodeownersData } from '../utils/codeownersServer.js';
 import { logger } from '../utils/index.js';
 
 // ESM equivalent of __dirname
@@ -141,10 +142,11 @@ export async function startServer(port: number): Promise<void> {
     setupMiddlewares: (middlewares: any[]) => {
       // Add API routes before other middlewares
       middlewares.unshift({
-        name: 'api-scan-data',
+        name: 'api-routes',
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         middleware: (req: any, res: any, next: any) => {
           const url = req.url || '';
+
           if (url === '/api/scan-data' || url.startsWith('/api/scan-data?')) {
             res.setHeader('Content-Type', 'application/json');
             res.setHeader('Cache-Control', 'no-cache');
@@ -153,6 +155,19 @@ export async function startServer(port: number): Promise<void> {
             });
             return;
           }
+
+          if (
+            url === '/api/codeowners-data' ||
+            url.startsWith('/api/codeowners-data?')
+          ) {
+            res.setHeader('Content-Type', 'application/json');
+            res.setHeader('Cache-Control', 'no-cache');
+            getCodeownersData().then(result => {
+              res.end(JSON.stringify(result));
+            });
+            return;
+          }
+
           next();
         },
       });
