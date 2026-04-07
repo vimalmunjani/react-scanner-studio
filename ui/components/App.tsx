@@ -3,12 +3,14 @@ import { ReportProvider, useReport } from '@/lib/report-context';
 import { SplashScreen } from '@/components/splash-screen';
 import { ThemeProvider } from '@/lib/theme-context';
 import { NavigationProvider, useNavigation } from '@/lib/navigation-context';
+import { CodeownersProvider } from '@/lib/codeowners-context';
 import { DashboardHeader } from '@/components/dashboard/dashboard-header';
 import { StatCards } from '@/components/dashboard/stat-cards';
 import { UsageChart } from '@/components/dashboard/usage-chart';
-import { TreemapChart } from '@/components/dashboard/treemap-chart';
 import { ComponentDetail } from '@/components/dashboard/component-detail';
 import { ComponentInventory } from '@/components/dashboard/component-inventory';
+import { CodeOwnersView } from '@/components/dashboard/code-owners';
+import { CodeownersSummary } from '@/components/dashboard/codeowners-summary';
 import { AppSidebar } from '@/components/app-sidebar';
 import {
   SidebarProvider,
@@ -22,7 +24,7 @@ function DashboardView() {
       <DashboardHeader />
       <StatCards />
       <UsageChart />
-      <TreemapChart />
+      <CodeownersSummary />
     </div>
   );
 }
@@ -76,6 +78,7 @@ function MainContent() {
           <div className='max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6'>
             {page === 'dashboard' && <DashboardView />}
             {page === 'inventory' && <InventoryView />}
+            {page === 'code-owners' && <CodeOwnersView />}
           </div>
         </div>
       </SidebarInset>
@@ -88,9 +91,11 @@ export default function App() {
   return (
     <ThemeProvider>
       <ReportProvider>
-        <NavigationProvider>
-          <MainContent />
-        </NavigationProvider>
+        <CodeownersProvider>
+          <NavigationProvider>
+            <MainContent />
+          </NavigationProvider>
+        </CodeownersProvider>
       </ReportProvider>
     </ThemeProvider>
   );

@@ -9,6 +9,7 @@ import {
 } from 'lucide-react';
 import { useNavigation, type Page } from '@/lib/navigation-context';
 import { useReport } from '@/lib/report-context';
+import { useCodeowners } from '@/lib/codeowners-context';
 import { ThemeSwitcher } from '@/components/theme-switcher';
 import {
   Sidebar,
@@ -34,7 +35,7 @@ const NAV_ITEMS: {
 }[] = [
   { id: 'dashboard', label: 'Dashboard', icon: LayoutDashboard },
   { id: 'inventory', label: 'Component Inventory', icon: Package },
-  { id: 'code-owners', label: 'Code Owners', icon: Users, comingSoon: true },
+  { id: 'code-owners', label: 'Code Owners', icon: Users },
   {
     id: 'monorepo-usage',
     label: 'Usage by Packages',
@@ -59,6 +60,7 @@ const EXTERNAL_LINKS = [
 export function AppSidebar() {
   const { page, setPage } = useNavigation();
   const { report } = useReport();
+  const { codeownersReport } = useCodeowners();
   const { state } = useSidebar();
   const collapsed = state === 'collapsed';
 
@@ -122,6 +124,16 @@ export function AppSidebar() {
                           {report.totalUniqueComponents}
                         </Badge>
                       )}
+                      {item.id === 'code-owners' &&
+                        codeownersReport &&
+                        !collapsed && (
+                          <Badge
+                            variant='secondary'
+                            className='ml-auto text-[10px] px-1.5 py-0 tabular-nums'
+                          >
+                            {codeownersReport.totalOwners}
+                          </Badge>
+                        )}
                     </SidebarMenuButton>
                   </SidebarMenuItem>
                 );
