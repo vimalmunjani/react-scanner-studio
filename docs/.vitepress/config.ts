@@ -46,6 +46,13 @@ export default defineConfig({
         ],
       },
       {
+        text: 'Features',
+        items: [
+          { text: 'Code Owners', link: '/features/codeowners' },
+          { text: 'Usage by Packages', link: '/features/usage-by-packages' },
+        ],
+      },
+      {
         text: 'CLI Commands',
         items: [
           { text: 'Overview', link: '/cli/' },

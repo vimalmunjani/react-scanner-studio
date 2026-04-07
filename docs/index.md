@@ -25,12 +25,12 @@ features:
   - icon: 🖥️
     title: Interactive Dashboard
     details: Beautiful, interactive UI for exploring component statistics, prop usage patterns, and adoption metrics.
-  - icon: 📦
-    title: Portable Build
-    details: Generate static HTML files that can be hosted anywhere or shared with your team — no server required.
   - icon: 📐
     title: Design System Tracking
     details: Measure how your design system is being used across teams and projects.
+  - icon: 👥
+    title: Code Owners Insights
+    details: Automatically maps component usage to your CODEOWNERS file, showing which teams own what — and spotting coverage gaps.
   - icon: 🔍
     title: Find Hidden Patterns
     details: Uncover prop usage patterns, identify inconsistencies, and make data-driven decisions.

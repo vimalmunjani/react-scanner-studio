@@ -5,7 +5,8 @@
   "description": "Test fixture for react-scanner-studio manual testing",
   "scripts": {
     "scan": "node ../dist/index.js scan",
-    "start": "node ../dist/index.js start --ci"
+    "start": "node ../dist/index.js start --ci",
+    "build": "node ../dist/index.js build"
   },
   "dependencies": {
     "react": "^18.3.1",

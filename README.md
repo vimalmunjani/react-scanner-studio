@@ -22,6 +22,7 @@ React Scanner Studio helps you track design system adoption, discover unused com
 - 📦 **Portable Static Build** — Generate static HTML reports that can be hosted anywhere (GitHub Pages, Vercel, Netlify) or shared with your team—no server required
 - ⚡ **Zero Config Setup** — Get started in seconds with the `init` command that automatically configures everything for Next.js, Vite, or Create React App projects
 - 🎨 **Design System Observability** — Perfect for tracking design system component adoption, evaluating UI consistency, and planning migrations
+- 👥 **Code Owners Integration** — Automatically maps component usage to your CODEOWNERS file, giving per-team usage breakdowns, adoption spread analysis, and unowned file detection
 - 🔧 **CI/CD Ready** — Built-in CI mode for seamless integration with GitHub Actions and other continuous integration pipelines to generate automated usage metrics
 
 ## 📖 Documentation
@@ -136,6 +137,7 @@ react-scanner-studio build --ci
 - **Design System Observability & Adoption** — Track how your React design system components are being utilized across different teams and repositories.
 - **Frontend Codebase Analytics** — Understand which React components are most popular, which are underutilized, and identify candidates for deprecation.
 - **Prop Pattern Analysis** — Discover common prop combinations, hardcoded values, and usage patterns to optimize component APIs.
+- **Code Ownership Analytics** — Automatically map component usage to your CODEOWNERS file to understand which teams own the most component surface area, identify cross-team dependencies, and spot files without ownership coverage.
 - **Safe Refactoring & Migration Planning** — Identify all locations a component is used before modifying its API, deprecating it, or migrating to a new library (e.g., from MUI to Tailwind).
 - **Automated Documentation** — Generate shareable component usage reports for stakeholders and design teams.
 

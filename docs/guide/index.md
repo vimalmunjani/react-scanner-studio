@@ -54,6 +54,10 @@ The `init` command automatically creates a `react-scanner.config.js` file tailor
 
 The `scan` command wraps `react-scanner` with a beautiful CLI experience, automatically finding your config file and providing helpful output.
 
+### 👥 Code Owners Insights
+
+React Scanner Studio automatically detects your `CODEOWNERS` file (from `.github/CODEOWNERS`, `CODEOWNERS`, or `docs/CODEOWNERS`) after every scan, requiring zero extra configuration. It enriches the scan output with per-owner component usage data, giving you a clear picture of which teams own which parts of your design system. A dedicated **Code Owners** page in the dashboard surfaces ownership analytics including stat cards, a donut chart, adoption spread, and a full owner breakdown table.
+
 ### 🚀 Development Server
 
 The `start` command launches a local development server with hot reloading, perfect for exploring your component data during development.

@@ -321,7 +321,7 @@ async function runBuild(): Promise<void> {
   const indexPath = resolve(outputDir, 'index.html');
   let indexHtml = readFileSync(indexPath, 'utf-8');
 
-  // Inject a script that intercepts fetch calls to /api/scan-data
+  // Inject a script that intercepts fetch calls to /api/scan-data and /api/codeowners-data
   const injectScript = `
     <script>
       // Intercept fetch for static build
@@ -330,6 +330,22 @@ async function runBuild(): Promise<void> {
         if (url === '/api/scan-data' || url.endsWith('/api/scan-data')) {
           const response = await originalFetch('./${scanFileName}', options);
           return response;
+        }
+        if (url === '/api/codeowners-data' || url.endsWith('/api/codeowners-data')) {
+          try {
+            const response = await originalFetch('./${scanFileName}', options);
+            const json = await response.json();
+            const codeownersData = (json && json.data && json.data.__codeowners) || null;
+            return new Response(
+              JSON.stringify({ data: codeownersData, error: null }),
+              { status: 200, headers: { 'Content-Type': 'application/json' } }
+            );
+          } catch {
+            return new Response(
+              JSON.stringify({ data: null, error: 'Failed to load codeowners data' }),
+              { status: 200, headers: { 'Content-Type': 'application/json' } }
+            );
+          }
         }
         return originalFetch(url, options);
       };

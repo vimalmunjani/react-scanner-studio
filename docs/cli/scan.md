@@ -82,6 +82,26 @@ module.exports = {
 };
 ```
 
+## Code Owners Enrichment
+
+After the scan completes, React Scanner Studio automatically checks for a CODEOWNERS file in the following locations, in order:
+
+1. `.github/CODEOWNERS`
+2. `CODEOWNERS`
+3. `docs/CODEOWNERS`
+
+If found, it enriches the scan output JSON with per-owner component usage stats. You will see the following confirmation in your terminal when this succeeds:
+
+```bash
+✔ Code owners data collected
+```
+
+This is entirely automatic and zero-config — no extra flags or configuration are needed.
+
+::: tip
+This requires the `raw-report` processor in your config. The `count-components` processor does not include file paths, which are needed for ownership matching.
+:::
+
 ## Workflow
 
 The `scan` command fits into the typical workflow as follows:
