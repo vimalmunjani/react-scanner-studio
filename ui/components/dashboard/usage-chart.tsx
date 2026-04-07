@@ -116,7 +116,7 @@ export function UsageChart() {
           <button
             type='button'
             onClick={() => setPage('inventory')}
-            className='flex items-center gap-1 text-xs font-medium text-primary/70 hover:text-primary transition-colors group'
+            className='flex items-center gap-1 text-xs font-medium text-primary/70 hover:text-primary transition-colors group cursor-pointer'
           >
             Explore more
             <ArrowRight className='w-3 h-3 group-hover:translate-x-0.5 transition-transform' />
