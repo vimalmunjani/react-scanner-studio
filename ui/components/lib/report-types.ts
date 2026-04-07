@@ -53,6 +53,30 @@ export interface ZombieProp {
   usageCount: number;
 }
 
+// ── Code Owners types ──────────────────────────────────────────────────────
+
+export interface OwnerStats {
+  owner: string;
+  totalInstances: number;
+  uniqueComponents: number;
+  fileCount: number;
+  components: { name: string; instances: number }[];
+  files: string[];
+}
+
+export interface CodeownersReport {
+  owners: OwnerStats[];
+  totalOwners: number;
+  totalInstances: number;
+  unownedFiles: string[];
+  unownedInstances: number;
+  mostSharedComponent: {
+    name: string;
+    ownerCount: number;
+    owners: string[];
+  } | null;
+}
+
 export interface NormalizedReport {
   format: ReportFormat;
   components: NormalizedComponent[];
