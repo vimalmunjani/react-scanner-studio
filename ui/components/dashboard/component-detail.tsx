@@ -7,9 +7,11 @@ import {
   Search,
   BarChart3,
 } from 'lucide-react';
+import { CopyablePath } from '@/components/ui/copyable-path';
 import {
   BarChart,
   Bar,
+  Cell,
   XAxis,
   YAxis,
   CartesianGrid,
@@ -41,6 +43,7 @@ export function ComponentDetail() {
   const [showAllFiles, setShowAllFiles] = useState(false);
   const [showAllProps, setShowAllProps] = useState(false);
   const [activeTab, setActiveTab] = useState('overview');
+  const [hoveredPropIndex, setHoveredPropIndex] = useState<number | null>(null);
 
   // Reset all local state when the selected component changes
   const [prevStateKey, setPrevStateKey] = useState(stateKey);
@@ -260,6 +263,34 @@ export function ComponentDetail() {
                               layout='vertical'
                               margin={{ top: 0, right: 16, bottom: 0, left: 0 }}
                             >
+                              <defs>
+                                <linearGradient
+                                  id='propBarGradient'
+                                  x1='0'
+                                  y1='0'
+                                  x2='1'
+                                  y2='0'
+                                >
+                                  <stop
+                                    offset='0%'
+                                    stopColor='var(--color-chart-2)'
+                                  />
+                                  <stop
+                                    offset='100%'
+                                    stopColor='var(--color-chart-2)'
+                                  />
+                                </linearGradient>
+                                <linearGradient
+                                  id='propBarGradientHover'
+                                  x1='0'
+                                  y1='0'
+                                  x2='1'
+                                  y2='0'
+                                >
+                                  <stop offset='0%' stopColor='#065f59' />
+                                  <stop offset='100%' stopColor='#065f59' />
+                                </linearGradient>
+                              </defs>
                               <CartesianGrid
                                 strokeDasharray='3 3'
                                 horizontal={false}
@@ -293,12 +324,43 @@ export function ComponentDetail() {
                                   color: 'var(--color-popover-foreground)',
                                   fontSize: 11,
                                 }}
+                                itemStyle={{
+                                  color: 'var(--color-popover-foreground)',
+                                }}
+                                labelStyle={{
+                                  color: 'var(--color-popover-foreground)',
+                                }}
+                                cursor={{
+                                  fill: 'var(--color-accent)',
+                                  opacity: 0.3,
+                                }}
                               />
                               <Bar
                                 dataKey='count'
-                                fill='var(--color-chart-2)'
                                 radius={[0, 4, 4, 0]}
-                              />
+                                cursor='pointer'
+                                onMouseEnter={(_, index) =>
+                                  setHoveredPropIndex(index)
+                                }
+                                onMouseLeave={() => setHoveredPropIndex(null)}
+                              >
+                                {propData.slice(0, 8).map((_, index) => (
+                                  <Cell
+                                    key={`cell-${index}`}
+                                    fill={
+                                      hoveredPropIndex === index
+                                        ? 'url(#propBarGradientHover)'
+                                        : 'url(#propBarGradient)'
+                                    }
+                                    opacity={
+                                      hoveredPropIndex !== null &&
+                                      hoveredPropIndex !== index
+                                        ? 0.3
+                                        : 1
+                                    }
+                                  />
+                                ))}
+                              </Bar>
                             </BarChart>
                           </ResponsiveContainer>
                         </div>
@@ -516,9 +578,7 @@ export function ComponentDetail() {
                               <div className='flex items-start gap-3'>
                                 <FileText className='w-4 h-4 text-muted-foreground mt-0.5 shrink-0' />
                                 <div className='min-w-0 flex-1'>
-                                  <p className='text-sm font-mono text-foreground break-all'>
-                                    {file}
-                                  </p>
+                                  <CopyablePath path={file} size='sm' />
                                   <div className='flex flex-wrap gap-1.5 mt-2'>
                                     {locations.slice(0, 20).map((loc, i) => (
                                       <span

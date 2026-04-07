@@ -1,4 +1,4 @@
-import { useMemo, useState, useEffect } from 'react';
+import { useMemo, useState } from 'react';
 import {
   BarChart,
   Bar,
@@ -9,7 +9,9 @@ import {
   ResponsiveContainer,
   Cell,
 } from 'recharts';
+import { ArrowRight } from 'lucide-react';
 import { useReport } from '@/lib/report-context';
+import { useNavigation } from '@/lib/navigation-context';
 import {
   Tooltip,
   TooltipTrigger,
@@ -82,21 +84,8 @@ function CustomYAxisTick({ x, y, payload }: CustomTickProps) {
 
 export function UsageChart() {
   const { report, setSelectedComponent } = useReport();
+  const { setPage } = useNavigation();
   const [hoveredIndex, setHoveredIndex] = useState<number | null>(null);
-  const [isDark, setIsDark] = useState(
-    document.documentElement.classList.contains('dark')
-  );
-
-  useEffect(() => {
-    const observer = new window.MutationObserver(() => {
-      setIsDark(document.documentElement.classList.contains('dark'));
-    });
-    observer.observe(document.documentElement, {
-      attributes: true,
-      attributeFilter: ['class'],
-    });
-    return () => observer.disconnect();
-  }, []);
 
   const data = useMemo(() => {
     if (!report) return [];
@@ -107,20 +96,33 @@ export function UsageChart() {
     }));
   }, [report]);
 
+  // Auto-size: 34px per bar row + 40px for axes/margins
+  const chartHeight = Math.max(120, data.length * 34 + 40);
+
   if (!report || data.length === 0) return null;
 
   return (
     <TooltipProvider delayDuration={100}>
       <div className='rounded-lg border border-border bg-card p-5'>
         <div className='flex items-center justify-between mb-4'>
-          <h2 className='text-sm font-medium text-card-foreground'>
-            Component Usage
-          </h2>
-          <span className='text-xs text-muted-foreground'>
-            Top {data.length} components
-          </span>
+          <div className='flex items-center gap-2'>
+            <h2 className='text-sm font-medium text-card-foreground'>
+              Component Usage
+            </h2>
+            <span className='text-xs text-muted-foreground'>
+              · Top {data.length} components
+            </span>
+          </div>
+          <button
+            type='button'
+            onClick={() => setPage('inventory')}
+            className='flex items-center gap-1 text-xs font-medium text-primary/70 hover:text-primary transition-colors group'
+          >
+            Explore more
+            <ArrowRight className='w-3 h-3 group-hover:translate-x-0.5 transition-transform' />
+          </button>
         </div>
-        <div className='h-[520px]'>
+        <div style={{ height: chartHeight }}>
           <ResponsiveContainer width='100%' height='100%'>
             <BarChart
               data={data}
@@ -139,8 +141,8 @@ export function UsageChart() {
                   x2='1'
                   y2='1'
                 >
-                  <stop offset='10%' stopColor='#ffab75' />
-                  <stop offset='100%' stopColor='#ff5a5a' />
+                  <stop offset='10%' stopColor='#c96825' />
+                  <stop offset='100%' stopColor='#b31e1e' />
                 </linearGradient>
               </defs>
               <CartesianGrid
@@ -197,13 +199,11 @@ export function UsageChart() {
                     key={`cell-${index}`}
                     fill={
                       hoveredIndex === index
-                        ? isDark
-                          ? '#ffffff'
-                          : '#000000'
+                        ? 'url(#barGradientHover)'
                         : 'url(#barGradient)'
                     }
                     opacity={
-                      hoveredIndex !== null && hoveredIndex !== index ? 0.5 : 1
+                      hoveredIndex !== null && hoveredIndex !== index ? 0.3 : 1
                     }
                   />
                 ))}
