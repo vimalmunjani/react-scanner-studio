@@ -1,11 +1,16 @@
-# Global fallback — design system team owns shared components
+# Shared component library — owned by the design system team
 /src/components/ @org/design-system
 
-# Auth feature — owned by identity team
-/src/features/auth/
+# Auth feature — identity team + alice (individual contributor)
+/src/features/auth/ @org/identity-team @alice
 
-# Checkout feature — owned by payments team
-/src/features/checkout/
+# Checkout feature — payments team
+/src/features/checkout/ @org/payments
 
-# Pages — shared ownership
+# Pages — frontend guild + charlie
 /src/pages/ @org/frontend @charlie
+
+# NOTE: src/admin/, src/analytics/, src/notifications/,
+#       src/settings/, src/reports/ and src/onboarding/
+#       are intentionally left unowned to demonstrate
+#       the "many unowned files" edge case in the dashboard.
